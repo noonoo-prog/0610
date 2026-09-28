@@ -481,11 +481,17 @@ function renderLocationShots(){
   const before=document.querySelector('[data-shot-group="'+g.id+'"]'),open=before?before.open:i===0;
   const completed=g.items.filter(([key])=>shotRow(key)?.checked).length;
   return '<details class="location-place" data-shot-group="'+g.id+'"'+(open?' open':'')+'><summary><b>'+E(g.name)+'</b><small>'+completed+' / '+g.items.length+'</small></summary>'+
-  '<div class="location-items">'+g.items.map(([key,label])=>{
-   const done=!!shotRow(key)?.checked;
-   return '<label class="location-check'+(done?' taken':'')+'"><input type="checkbox" data-check-key="'+key+'"'+(done?' checked':'')+
-    ' onchange="saveLocationShot(this.dataset.checkKey,this.checked)"><span>'+E(label)+'</span>'+(done?'<small>촬영함</small>':'')+'</label>';
-  }).join('')+'</div></details>';
+   '<div class="location-items">'+g.items.map(([key,label])=>{
+    const done=!!shotRow(key)?.checked,quick=SHOT_TO_QUICK.get(key),
+     checked=quick?!!quickRow(quick)?.checked:false;
+    return '<div class="location-linked" data-shot-row="'+key+'"><label class="location-check'+(done?' taken':'')+'">'+
+     '<input type="checkbox" data-check-key="'+key+'"'+(done?' checked':'')+
+     ' onchange="saveLocationShot(this.dataset.checkKey,this.checked)" aria-label="'+E(label)+' 사진 촬영"><span>'+E(label)+'</span>'+
+     (done?'<small>촬영함</small>':'')+'</label>'+
+     (quick?'<button type="button" class="linked-quick'+(checked?' done':'')+'" data-quick-key="'+quick+
+       '" aria-pressed="'+checked+'" onclick="setQuick(this.dataset.quickKey,!quickRow(this.dataset.quickKey)?.checked)">'+
+       (checked?'현장 확인 ✓':'현장 확인')+'</button>':'')+'</div>';
+   }).join('')+'</div></details>';
  }).join('');
 }
 function jumpToLocationPhotos(){
@@ -500,11 +506,11 @@ async function saveLocationShot(key,checked){
   const result=await api('photo-check',{method:'PUT',body:{visit_id:visitId,check_key:key,checked,expected_updated_at:old?.updated_at||null}});
   if(S.v?.visit.id!==visitId)return;
   S.v.photo_checks=(S.v.photo_checks||[]).filter(x=>x.check_key!==key).concat(result.photo_check);
-  renderLocationShots();
+  renderLocationShots();renderQuick();
   q('#sync').textContent='사진 촬영 체크 저장 완료 · 직원 간 공유 중';
  }catch(e){
   try{const latest=await api('visit',{q:'&id='+encodeURIComponent(visitId)});
-    if(S.v?.visit.id===visitId){S.v.photo_checks=latest.photo_checks;renderLocationShots();}
+    if(S.v?.visit.id===visitId){S.v.photo_checks=latest.photo_checks;renderLocationShots();renderQuick();}
   }catch(ignore){}
   alert(e.message);
  }finally{writing--;}
@@ -630,6 +636,41 @@ const QUICK_GROUPS=[
  {code:'3.5',keys:['3.5.1','3.5.4','3.5.6','3.5.10']}
 ];
 const QUICK_KEYS=QUICK_GROUPS.flatMap(g=>g.keys);
+
+const QUICK_SHOT_MAP={
+ '3.1.1':['p_site_landscape'],
+ '3.1.2':['p_roof_green'],
+ '3.1.3':['p_site_public'],
+ '3.1.5':['p_site_entry','p_shell_full'],
+ '3.2.1':['p_plant_tank','p_plant_water'],
+ '3.2.2':['p_site_drain','p_basement_drain','p_roof_drain'],
+ '3.2.5':['p_plant_air'],
+ '3.2.9':['p_common_lift'],
+ '3.3.1':['p_shell_window'],
+ '3.4.3':['p_site_settlement'],
+ '3.4.5':['p_shell_member','p_basement_crack'],
+ '3.4.7':['p_shell_finish','p_common_finish'],
+ '3.5.1':['p_common_corridor','p_common_stairs','p_fire_exit'],
+ '3.5.4':['p_common_firedoor'],
+ '3.5.6':['p_fire_smoke'],
+ '3.5.10':['p_basement_full']
+};
+const SHOT_TO_QUICK=new Map(Object.entries(QUICK_SHOT_MAP).flatMap(([quick,photos])=>photos.map(photo=>[photo,quick])));
+function photoStatsForQuick(key){
+ const mapped=QUICK_SHOT_MAP[key]||[];
+ return {total:mapped.length,taken:mapped.filter(photo=>shotRow(photo)?.checked).length};
+}
+function jumpToShotFromQuick(key){
+ if(!S.v)return;
+ const shots=QUICK_SHOT_MAP[key]||[];
+ if(!shots.length)return jumpToLocationPhotos();
+ const target=shots.find(shot=>!shotRow(shot)?.checked)||shots[0];
+ if(q('#mobileActions'))q('#mobileActions').open=false;
+ const group=document.querySelector('[data-shot-row="'+target+'"]')?.closest('.location-place');
+ if(group)group.open=true;
+ requestAnimationFrame(()=>document.querySelector('[data-shot-row="'+target+'"]')?.scrollIntoView({behavior:'smooth',block:'center'}));
+}
+
 function quickRow(key){return(S.v?.quick||[]).find(r=>r.item_key===key);}
 function quickMarkup(){
  const nameByKey=new Map(gs.flatMap(g=>g[2].map(item=>[item[0],item[1]])));
@@ -640,12 +681,15 @@ function quickMarkup(){
   return '<details class="quick-group" data-group="'+group.code+'"'+(expanded?' open':'')+'><summary>'+
    E(heading?heading[0]+' '+heading[1]:'점검')+' <span class="muted">'+checked+'/'+group.keys.length+'</span></summary>'+
    group.keys.map(key=>{
-    const done=!!quickRow(key)?.checked,photos=P(key).length,result=D(key).result||'미평가';
+    const done=!!quickRow(key)?.checked,photos=P(key).length,result=D(key).result||'미평가',link=photoStatsForQuick(key);
     return '<div class="quick-line'+(done?' done':'')+'"><label class="quick-label">'+
       '<input type="checkbox" data-key="'+key+'"'+(done?' checked':'')+
-      ' onchange="setQuick(this.dataset.key,this.checked)" aria-label="'+E(nameByKey.get(key))+' 확인">'+
+      ' onchange="setQuick(this.dataset.key,this.checked)" aria-label="'+E(nameByKey.get(key))+' 현장 확인">'+
       '<span>'+E(nameByKey.get(key))+'</span></label>'+
-      '<span class="quick-meta">사진 '+photos+' · '+E(result)+'</span>'+
+      '<span class="quick-meta">업로드 '+photos+' · '+E(result)+'</span>'+
+      '<button class="quick-photo-link'+(link.taken===link.total?' complete':'')+
+       '" type="button" data-quick-key="'+key+'" onclick="jumpToShotFromQuick(this.dataset.quickKey)" aria-label="'+E(nameByKey.get(key))+' 관련 촬영 체크 열기">'+
+       '촬영 '+link.taken+'/'+link.total+'</button>'+
       '<button class="quick-detail" data-key="'+key+'" onclick="goQuickDetail(this.dataset.key)">상세</button></div>';
    }).join('')+'</details>';
  }).join('');
@@ -685,12 +729,12 @@ async function setQuick(key,value){
   const result=await api('quick',{method:'PUT',body:{visit_id:visitId,item_key:key,checked:value,expected_updated_at:old?.updated_at||null}});
   if(!S.v||S.v.visit.id!==visitId)return;
   S.v.quick=(S.v.quick||[]).filter(x=>x.item_key!==key).concat(result.quick);
-  renderQuick();
+  renderQuick();renderLocationShots();
   q('#sync').textContent='간편 체크 저장 완료 · 직원 간 공유 중';
  }catch(e){
   try{
    const current=await api('visit',{q:'&id='+encodeURIComponent(visitId)});
-   if(S.v?.visit.id===visitId){S.v.quick=current.quick;renderQuick();}
+   if(S.v?.visit.id===visitId){S.v.quick=current.quick;renderQuick();renderLocationShots();}
   }catch(ignore){}
   alert(e.message);
  }finally{writing--;}
@@ -815,9 +859,9 @@ async function syncShared(){
  const careChanged=rowsUpdated(S.v.care_schedules,j.care_schedules,'task_key');
  S.v=j;
  for(const k of keys)refreshCard(k,false);
- if(quickChanged&&!keys.length)renderQuick();
+ if(quickChanged||shotChanged)renderQuick();
  if(fieldChanged)renderFieldPhotos();
- if(shotChanged)renderLocationShots();
+ if(quickChanged||shotChanged)renderLocationShots();
  if(careChanged)renderCareSchedules();
  q('#sync').textContent='공유 동기화 완료 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
 }
