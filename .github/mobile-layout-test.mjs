@@ -19,7 +19,7 @@ try {
   const mockPhotoId1 = '30000000-0000-4000-8000-000000000003';
   const mockPhotoId2 = '30000000-0000-4000-8000-000000000004';
   const photos = width === 390 ? [mockPhotoId1,mockPhotoId2].map((id,i)=>({id,item_key:'inbox',url:'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',caption:'',original_name:'현장'+(i+1)+'.jpg',created_at:'2026-09-28T03:00:0'+i+'Z'})) : [];
-  const shotChecks = [], quickChecks = [], careSchedules = [];
+  const shotChecks = [], quickChecks = [], careSchedules = [], savedItems = [];
   await page.route('**/functions/v1/sangeo-inspection*', async route => {
    const op = new URL(route.request().url()).searchParams.get('op');
    if(op==='photo-check'){
@@ -43,6 +43,15 @@ try {
     careSchedules.push(row);
     return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({care_schedule:row})});
    }
+   if(op==='item'){
+    const b=route.request().postDataJSON();
+    if(b.item_key!=='3.2.1'||b.visit_id!==visitId||b.management?.cycle>600)throw Error('Invalid inspection period update');
+    const row={item_key:b.item_key,result:b.result||null,note:b.note||'',management:b.management,
+      updated_at:'2026-09-28T04:17:'+String(savedItems.length+1).padStart(2,'0')+'Z',updated_by:'공용 사용자'};
+    const i=savedItems.findIndex(x=>x.item_key===row.item_key);
+    if(i>=0)savedItems[i]=row;else savedItems.push(row);
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({item:row})});
+   }
    if(op==='photo-category'){
     const body=route.request().postDataJSON();
     if(body.item_key!=='3.1.1'||body.moves.length!==2||body.moves.some(p=>p.from!=='inbox')) throw Error('Incorrect bulk assignment request');
@@ -50,7 +59,7 @@ try {
     for(const photo of photos)if(changed.some(p=>p.id===photo.id))photo.item_key=body.item_key;
     return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({photos:changed})});
    }
-   const value=op==='visit'?{...mock.visit,photos,quick:quickChecks,photo_checks:shotChecks,care_schedules:careSchedules}:mock[op]??{ok:true};
+   const value=op==='visit'?{...mock.visit,items:savedItems,photos,quick:quickChecks,photo_checks:shotChecks,care_schedules:careSchedules}:mock[op]??{ok:true};
    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(value) });
   });
   await page.goto(origin + '?building=' + buildingId + '&visit=' + visitId, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -70,7 +79,7 @@ try {
   if (sizes.document > width + 1) throw Error('Horizontal overflow at ' + width + 'px: ' + JSON.stringify(sizes));
   if (sizes.header > 88 || sizes.dock > 105) throw Error('Header or dock too tall: ' + JSON.stringify(sizes));
   if (sizes.textSize < 16 || sizes.buttonHeight < 44) throw Error('Form or rating target too small: ' + JSON.stringify(sizes));
-  if (!sizes.dockVisible || sizes.groupCount !== 5 || sizes.openGroups !== 1 || sizes.menuCount !== 8) throw Error('Mobile navigation/groups missing: ' + JSON.stringify(sizes));
+  if (!sizes.dockVisible || sizes.groupCount !== 5 || sizes.openGroups !== 1 || sizes.menuCount !== 9) throw Error('Mobile navigation/groups missing: ' + JSON.stringify(sizes));
   if (!(await page.locator('#who').textContent()).includes('공용 점검 계정')) throw Error('Unified account label missing');
   if (await page.locator('#manageBtn').evaluate(el=>el.classList.contains('hidden'))) throw Error('Shared password settings not accessible');
   await page.locator('#mobileActions > summary').click();
@@ -120,6 +129,23 @@ try {
   await page.locator('details.quick-group[data-group="3.5"] > summary').click();
   await page.locator('.quick-detail[data-key="3.5.4"]').click();
   if (!(await page.locator('[data-inspection-group="3.5"]').evaluate(el => el.open))) throw Error('Checklist failed to open detailed group');
+  await page.locator('#mobileActions > summary').click();
+  await page.getByRole('button', { name: '점검주기·교체시기', exact: true }).click();
+  if (!(await page.locator('#cycleChecklist').evaluate(el => el.open))) throw Error('Period checklist failed to open');
+  if ((await page.locator('#cycleRows .cycle-row').count()) !== 9) throw Error('Expected exactly nine manual period items');
+  if (width === 390) {
+    await page.locator('[id="pcAction-3.2.1"]').selectOption('점검');
+    await page.locator('[id="pcMonths-3.2.1"]').fill('6');
+    await page.locator('[id="pcRow-3.2.1"] .cycle-buttons .pri').click();
+    await page.waitForFunction(() => document.getElementById('cycleCount')?.textContent?.includes('1 / 9'));
+    if ((await page.locator('[id="cy-3.2.1"]').inputValue())!=='6') throw Error('Period did not reach the detailed inspection form');
+    if ((await page.locator('[id="card-3.2.1"] .status-pill').textContent()).trim()!=='미평가') throw Error('Period input incorrectly completed the formal rating');
+    await page.locator('[data-inspection-group="3.2"] > summary').click();
+    await page.locator('[id="cy-3.2.1"]').fill('12');
+    await page.locator('[id="card-3.2.1"] .card-actions .pri').click();
+    await page.waitForFunction(() => document.getElementById('pcMonths-3.2.1')?.value==='12');
+    if ((await page.locator('#cycleCount').textContent()).includes('2 / 9')) throw Error('Unexpected completed-period count');
+  }
   if (width === 390) await page.screenshot({ path: '/tmp/sangeo-mobile-390.png', fullPage: false });
   console.log('PASS MOBILE ' + width + 'px ' + JSON.stringify(sizes));
   await page.close();
