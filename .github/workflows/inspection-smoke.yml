@@ -36,6 +36,12 @@ jobs:
           grep -q 'photo-category' /tmp/sangeo-page
           grep -q 'id="locationPhotos"' /tmp/sangeo-page
           grep -q 'id="buildingCare"' /tmp/sangeo-page
+          grep -q 'id="wsPane-onsite"' /tmp/sangeo-page
+          grep -q 'id="wsPane-care"' /tmp/sangeo-page
+          grep -q 'id="wsPane-photos"' /tmp/sangeo-page
+          grep -q 'id="wsPane-evaluation"' /tmp/sangeo-page
+          grep -q 'id="visitTrash"' /tmp/sangeo-page
+          grep -q 'restoreTrashedVisit' /tmp/sangeo-page
           grep -q "api('photo-check'" /tmp/sangeo-page
           grep -q "api('care-schedule'" /tmp/sangeo-page
           echo "Staff website is published and served as HTML"
@@ -60,6 +66,9 @@ jobs:
           test "$shot_code" = "401"
           test "$care_code" = "401"
           echo "Photo check and care schedule remain available only to logged-in staff"
+          trash_code="$(curl --max-time 20 -sS -o /tmp/blocked-visit-trash -w '%{http_code}' -X PATCH "$api?op=visit-trash" -H 'Content-Type: application/json' -d '{}')"
+          test "$trash_code" = "401"
+          echo "Inspection trash and restore require a signed-in session"
       - name: Check cross-site browser preflight
         shell: bash
         run: |
