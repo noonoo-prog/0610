@@ -51,11 +51,14 @@ async function setup(page,width){
    const row={...payload,updated_at:'2026-09-28T04:03:00Z'};
    state.care=[row];reply={care_schedule:row};
   }else if(op==='item'){
+   if(payload.result==='불량'){status=409;reply={error:'테스트용 저장 거부'};}
+   else{
    assert(payload.item_key==='3.2.1'&&Number(payload.management.cycle)<=600,
     'Invalid period payload',payload);
    const row={item_key:payload.item_key,result:payload.result??null,note:payload.note??'',
     management:payload.management,updated_at:'2026-09-28T04:17:00Z',updated_by:'공용 사용자'};
    state.items=[row];reply={item:row};
+   }
   }else if(op==='photo-category'){
    assert(payload.item_key==='3.1.1'&&payload.moves.length===2,'Incorrect bulk photo assignment',payload);
    const changed=payload.moves.map(x=>({id:x.id,item_key:payload.item_key}));
@@ -84,17 +87,28 @@ try{
   assert(layout.overflow<=width+1,'Mobile horizontal overflow at '+width,layout);
   assert(layout.header<=90&&layout.bottom<=110,'Mobile header/footer too tall',layout);
   assert(layout.bottomVisible&&layout.tabs===4&&layout.panes===4,'Expected four mobile workspaces',layout);
+  assert(await page.locator('.workflow-stat').count()===4,'Four status shortcuts missing');
+  assert((await page.locator('#statShot').textContent()).trim()==='0 / 32','Shot summary inaccurate');
   assert((await page.locator('#who').textContent()).includes('공용 점검 계정'),'Unified login missing');
   assert((await page.locator('#wsPane-onsite').isVisible())&&!await page.locator('#wsPane-evaluation').isVisible(),
     'On-site should be the only visible initial page');
   await page.getByRole('button',{name:'현장',exact:true}).click();
   assert((await page.locator('.location-check').count())===32,'Place photo check items missing');
   if(width===390){
+   await page.locator('#shotOnlyOpen').check();
+   assert((await page.locator('#shotVisibleCount').textContent()).includes('32개'),'Initial missing-shot count wrong');
    await page.locator('input[data-check-key="p_site_landscape"]').check();
    await page.waitForFunction(()=>document.getElementById('locPhotoTotal')?.textContent.startsWith('1 / 32'));
+   await page.waitForFunction(()=>document.getElementById('statShot')?.textContent.trim()==='1 / 32');
+   assert(!(await page.locator('[data-shot-row="p_site_landscape"]').isVisible()),'Completed photo still visible under missing-only filter');
+   await page.locator('#shotOnlyOpen').uncheck();
    await page.locator('[data-shot-row="p_site_landscape"] .linked-quick').click();
    await page.waitForFunction(()=>document.querySelector('[data-shot-row="p_site_landscape"] .linked-quick')?.getAttribute('aria-pressed')==='true');
    assert(await page.locator('input[data-key="3.1.1"]').isChecked(),'Place and quick link broken');
+   await page.locator('#quickOnlyOpen').check();
+   assert((await page.locator('#quickVisibleCount').textContent()).includes('15개'),'Missing onsite checks count wrong');
+   assert(!(await page.locator('input[data-key="3.1.1"]').isVisible()),'Completed on-site row should be hidden');
+   await page.locator('#quickOnlyOpen').uncheck();
   }
   await page.getByRole('button',{name:'관리',exact:true}).click();
   assert(await page.locator('#wsPane-care').isVisible(),'Management page hidden');
@@ -122,6 +136,7 @@ try{
    await page.getByRole('button',{name:'선택 사진 항목 지정',exact:true}).click();
    await page.waitForFunction(()=>document.getElementById('fieldCount')?.textContent==='미분류 0장');
    assert(state.photos.every(p=>p.item_key==='3.1.1'),'Photo data not reclassified');
+   assert((await page.locator('#statPhoto').textContent()).trim()==='0장','Photo dashboard count not updated');
   }
   await page.getByRole('button',{name:'평가',exact:true}).click();
   assert(await page.locator('#wsPane-evaluation').isVisible(),'Detailed evaluation page hidden');
@@ -139,10 +154,27 @@ try{
    await page.getByRole('button',{name:'관리',exact:true}).click();
    await page.locator('[id="pcRow-3.2.1"] .cycle-buttons .ghost').click();
    assert(await page.locator('#wsPane-evaluation').isVisible(),'Cycle -> detail tab navigation broken');
+   await page.locator('#evalSearch').fill('방화구획');
+   assert((await page.locator('#items .c:not(.filter-hidden)').count())===1,'Evaluation search failed');
+   assert((await page.locator('#evalVisibleCount').textContent()).includes('1 / 50'),'Evaluation search count wrong');
+   await page.locator('#evalSearch').fill('');
+   await page.locator('#evalOnlyOpen').check();
+   await page.locator('[id="card-3.2.1"] .st button').filter({hasText:'양호'}).click();
+   await page.waitForFunction(()=>document.getElementById('statEval')?.textContent.trim()==='1 / 50');
+   assert(!(await page.locator('[id="card-3.2.1"]').isVisible()),'Rated card should disappear with unrated filter');
+   await page.locator('#evalOnlyOpen').uncheck();
+   await page.locator('[id="card-3.2.1"] .st button').filter({hasText:'불량'}).click();
+   await page.waitForFunction(()=>document.querySelector('#saveToast')?.textContent==='');
+   assert((await page.locator('[id="card-3.2.1"] .status-pill').textContent()).trim()==='양호','Failed rating was shown as saved');
    await page.getByRole('button',{name:'현장',exact:true}).click();
    if (!(await page.locator('details.quick-group[data-group="3.5"]').evaluate(el=>el.open))) await page.locator('details.quick-group[data-group="3.5"] > summary').click();
    await page.locator('.quick-detail[data-key="3.5.4"]').click();
    assert(await page.locator('#wsPane-evaluation').isVisible(),'Quick -> detail tab navigation broken');
+   await page.locator('#evalOnlyOpen').check();
+   await page.locator('#evalSearch').fill('급수');
+   await page.locator('#wsPane-evaluation .evaluation-tools .pri').click();
+   assert((await page.locator('#evalSearch').inputValue())==='','Next-unrated shortcut did not reset search');
+   assert(await page.locator('[id="card-3.1.1"]').isVisible(),'Next-unrated shortcut did not reveal first pending evaluation');
   }
   await page.locator('#inspect .inspect-heading button').first().click();
   await page.locator('#visits:not(.hidden)').waitFor();
