@@ -898,10 +898,9 @@ function progress(){
 }
 function render(){
  renderQuick();
- const mobile=window.matchMedia('(max-width:680px)').matches;
  q('#items').innerHTML=gs.map((g,i)=>{
   const done=g[2].filter(x=>D(x[0]).result).length;
-  return '<details class="inspection-group" data-inspection-group="'+g[0]+'"'+(!mobile||i===0?' open':'')+'><summary><span>'+E(g[0]+' '+g[1])+'</span><span class="group-count">'+done+' / '+g[2].length+' 평가</span></summary>'+g[2].map(x=>card(x[0],x[1])).join('')+'</details>';
+  return '<details class="inspection-group" data-inspection-group="'+g[0]+'"'+(i===0?' open':'')+'><summary><span>'+E(g[0]+' '+g[1])+'</span><span class="group-count">'+done+' / '+g[2].length+' 평가</span></summary>'+g[2].map(x=>card(x[0],x[1])).join('')+'</details>';
  }).join('');
  progress();
 }
