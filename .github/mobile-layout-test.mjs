@@ -9,7 +9,7 @@ const mock = {
   status: { configured: true }, me: { name: '현장 직원', role: 'staff' },
   buildings: { buildings: [building] },
   visits: { visits: [visit] },
-  visit: { building, visit, items: [], photos: [], maintenance: [], quick: [] }
+  visit: { building, visit, items: [], photos: [], maintenance: [], quick: [], photo_checks: [], care_schedules: [] }
 };
 const browser = await chromium.launch({ headless: true });
 try {
@@ -19,8 +19,23 @@ try {
   const mockPhotoId1 = '30000000-0000-4000-8000-000000000003';
   const mockPhotoId2 = '30000000-0000-4000-8000-000000000004';
   const photos = width === 390 ? [mockPhotoId1,mockPhotoId2].map((id,i)=>({id,item_key:'inbox',url:'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',caption:'',original_name:'현장'+(i+1)+'.jpg',created_at:'2026-09-28T03:00:0'+i+'Z'})) : [];
+  const shotChecks = [], careSchedules = [];
   await page.route('**/functions/v1/sangeo-inspection*', async route => {
    const op = new URL(route.request().url()).searchParams.get('op');
+   if(op==='photo-check'){
+    const body=route.request().postDataJSON();
+    if(body.check_key!=='p_site_landscape'||body.checked!==true||body.visit_id!==visitId)throw Error('Photo shot payload invalid');
+    const row={check_key:body.check_key,checked:body.checked,updated_at:'2026-09-28T04:00:00Z',updated_by:'직원'};
+    shotChecks.push(row);
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({photo_check:row})});
+   }
+   if(op==='care-schedule'){
+    const body=route.request().postDataJSON();
+    if(body.task_key!=='m_site_leaves'||body.frequency!=='monthly'||body.last_done_on!=='2026-09-01'||body.building_id!==buildingId)throw Error('Care schedule payload invalid');
+    const row={task_key:body.task_key,frequency:body.frequency,last_done_on:body.last_done_on,note:body.note||'',updated_at:'2026-09-28T04:00:00Z',updated_by:'직원'};
+    careSchedules.push(row);
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({care_schedule:row})});
+   }
    if(op==='photo-category'){
     const body=route.request().postDataJSON();
     if(body.item_key!=='3.1.1'||body.moves.length!==2||body.moves.some(p=>p.from!=='inbox')) throw Error('Incorrect bulk assignment request');
@@ -28,7 +43,7 @@ try {
     for(const photo of photos)if(changed.some(p=>p.id===photo.id))photo.item_key=body.item_key;
     return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({photos:changed})});
    }
-   const value=op==='visit'?{...mock.visit,photos}:mock[op]??{ok:true};
+   const value=op==='visit'?{...mock.visit,photos,photo_checks:shotChecks,care_schedules:careSchedules}:mock[op]??{ok:true};
    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(value) });
   });
   await page.goto(origin + '?building=' + buildingId + '&visit=' + visitId, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -48,12 +63,28 @@ try {
   if (sizes.document > width + 1) throw Error('Horizontal overflow at ' + width + 'px: ' + JSON.stringify(sizes));
   if (sizes.header > 88 || sizes.dock > 105) throw Error('Header or dock too tall: ' + JSON.stringify(sizes));
   if (sizes.textSize < 16 || sizes.buttonHeight < 44) throw Error('Form or rating target too small: ' + JSON.stringify(sizes));
-  if (!sizes.dockVisible || sizes.groupCount !== 5 || sizes.openGroups !== 1 || sizes.menuCount !== 7) throw Error('Mobile navigation/groups missing: ' + JSON.stringify(sizes));
+  if (!sizes.dockVisible || sizes.groupCount !== 5 || sizes.openGroups !== 1 || sizes.menuCount !== 8) throw Error('Mobile navigation/groups missing: ' + JSON.stringify(sizes));
   await page.locator('#mobileActions > summary').click();
   const menu = await page.locator('.mobile-more-menu').boundingBox();
   if (!menu || menu.x < -1 || menu.x + menu.width > width + 1) throw Error('More menu overflows viewport: ' + JSON.stringify(menu));
+  await page.getByRole('button', { name: '촬영 체크', exact: true }).click();
+  if ((await page.locator('.location-place').count()) !== 7) throw Error('Place groups missing');
+  if ((await page.locator('.location-check').count()) !== 30) throw Error('Photo shot list not complete');
+  if (width === 390) {
+   await page.locator('input[data-check-key="p_site_landscape"]').check();
+   await page.waitForFunction(() => document.getElementById('locPhotoTotal')?.textContent?.startsWith('1 / 30'));
+  }
+  await page.getByRole('button', { name: '청소 주기', exact: true }).click();
+  if ((await page.locator('.care-task').count()) !== 15) throw Error('Building care list not complete');
+  if (width === 390) {
+   await page.locator('#careFrequency-m_site_leaves').selectOption('monthly');
+   await page.locator('#careLast-m_site_leaves').fill('2026-09-01');
+   await page.locator('#careTask-m_site_leaves .care-actions .pri').click();
+   await page.waitForFunction(() => document.querySelector('#careTask-m_site_leaves .care-next')?.textContent?.includes('2026-10-01'));
+   if (!(await page.locator('#careTotal').textContent()).includes('1 / 15')) throw Error('Saved cycle not reflected');
+  }
   await page.locator('#mobileActions > summary').click();
-  await page.getByRole('button', { name: /사진 정리/ }).click();
+  await page.getByRole('button', { name: /사진 업로드·정리/ }).click();
   if (!(await page.locator('#fieldDetails').evaluate(el => el.open))) throw Error('Photo inbox jump failed');
   if (width === 390) {
    if (!(await page.locator('#fieldCount').textContent()).includes('미분류 2장')) throw Error('Unsorted photos missing');
