@@ -233,7 +233,7 @@ button:focus-visible,.camera-action:focus-within,input:focus-visible,textarea:fo
 <section id="login" class="p hidden"><h1>공용 접속</h1><p class="muted">공통 비밀번호 하나로 건물과 점검 기록을 이용합니다.</p><div class="stack"><input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()"><button class="pri" onclick="login()">접속</button></div></section>
 <section id="dash" class="hidden"><div class="p"><h1>공유 건축물</h1><p class="muted">같은 건물과 점검 기록을 공용으로 사용합니다. 주소로 검색하거나 선택하세요.</p><div id="who" class="muted"></div><label>건축물명 또는 주소 검색<input id="searchBuilding" type="search" placeholder="예: 퇴계로 264" oninput="renderBuildings()"></label><div style="height:9px"></div><button class="pri" onclick="q('#add').classList.toggle('hidden')">+ 건물 등록 / 주소 찾기</button><div id="add" class="stack hidden" style="margin-top:10px"><input id="bn" placeholder="건축물명"><input id="ba" placeholder="건축물 주소 (필수)"><div class="row"><input id="bu" placeholder="주용도"><input id="bd" type="date"></div><div class="muted">이미 등록된 주소라면 새 건물을 만들지 않고 기존 공유 건물로 이동합니다.</div><button class="pri" onclick="addB()">등록하고 공유 건물 열기</button></div></div><div id="bl"></div></section>
 <section id="visits" class="hidden"><div class="p"><button class="ghost" onclick="goDash()">← 건물 목록</button><h1 id="bt"></h1><div id="bm" class="muted"></div><div id="addressMissing" class="guide hidden" style="margin-top:9px">이 건물은 아직 주소가 없습니다. 아래 ‘주소 등록/수정’을 눌러 기존 점검 기록을 유지한 채 주소를 등록하세요.</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin:12px 0"><button class="pri" onclick="shareB()">🔗 건물 링크 공유</button><button class="ghost" onclick="editB()">주소 등록 / 수정</button></div><div id="editBuilding" class="stack hidden" style="margin-bottom:12px"><input id="ebn" placeholder="건축물명"><input id="eba" placeholder="건축물 주소 (필수)"><div class="row"><input id="ebu" placeholder="주용도"><input id="ebd" type="date"></div><button class="pri" onclick="saveB()">이 건물에 주소 저장</button></div><p class="muted">같은 건물·같은 날짜의 점검은 모두 하나의 공유 기록으로 들어갑니다.</p><div class="row"><input id="vd" type="date"><button class="pri" onclick="newV()">선택한 날짜의 공유 점검 열기</button></div></div><div id="vl"></div><div class="p"><button class="pri" onclick="downloadPhotoBook('building')">이 건물 사진 JPG/PNG ZIP 다운로드</button><p id="albumStatusBuilding" class="muted">사진을 점검항목명+순번으로 묶어 JPG/PNG 파일이 담긴 ZIP 한 개로 저장합니다.</p></div></section>
-<section id="inspect" class="hidden"><div class="p noprint"><button class="ghost" onclick="view('visits')">← 점검 목록</button><h1 id="vt"></h1><div class="muted" id="sharedAddress"></div><div class="bar" style="margin-top:9px"><i id="bar"></i></div><div id="prog" class="muted"></div><div id="sync" class="muted">직원 공통 기록 · 15초 간격 자동 동기화</div></div><div class="p noprint location-photos" id="locationPhotos">
+<section id="inspect" class="hidden"><div class="p noprint"><button class="ghost" onclick="view('visits')">← 점검 목록</button><h1 id="vt"></h1><div class="muted" id="sharedAddress"></div><div class="bar" style="margin-top:9px"><i id="bar"></i></div><div id="prog" class="muted"></div><div id="sync" class="muted">공용 점검 기록 · 15초 간격 자동 동기화</div></div><div class="p noprint location-photos" id="locationPhotos">
 <div class="check-title"><h2>장소별 사진 촬영 체크</h2><strong id="locPhotoTotal" role="status" aria-live="polite">0 / 32</strong></div>
 <p class="muted">휴대전화 앨범에 사진을 찍은 뒤 촬영 여부를 체크하세요. 연결된 현장 확인도 바로 체크할 수 있습니다. 사진 업로드는 필요하지 않습니다.</p>
 <div class="bar"><i id="locPhotoBar"></i></div><div id="locPhotoRows"></div>
@@ -507,7 +507,7 @@ async function saveLocationShot(key,checked){
   if(S.v?.visit.id!==visitId)return;
   S.v.photo_checks=(S.v.photo_checks||[]).filter(x=>x.check_key!==key).concat(result.photo_check);
   renderLocationShots();renderQuick();
-  q('#sync').textContent='사진 촬영 체크 저장 완료 · 직원 간 공유 중';
+  q('#sync').textContent='사진 촬영 체크 저장 완료 · 공용 기록에 반영';
  }catch(e){
   try{const latest=await api('visit',{q:'&id='+encodeURIComponent(visitId)});
     if(S.v?.visit.id===visitId){S.v.photo_checks=latest.photo_checks;renderLocationShots();renderQuick();}
@@ -610,7 +610,7 @@ async function saveCareTask(key,today){
   if(S.v?.building.id!==buildingId)return;
   S.v.care_schedules=(S.v.care_schedules||[]).filter(x=>x.task_key!==key).concat(response.care_schedule);
   updateCareTask(key);
-  q('#sync').textContent='건물 관리일정 저장 완료 · 직원 간 공유 중';
+  q('#sync').textContent='건물 관리일정 저장 완료 · 공용 기록에 반영';
  }catch(error){
   try{const latest=await api('visit',{q:'&id='+encodeURIComponent(S.v.visit.id)});
    if(S.v?.building.id===buildingId){
@@ -730,7 +730,7 @@ async function setQuick(key,value){
   if(!S.v||S.v.visit.id!==visitId)return;
   S.v.quick=(S.v.quick||[]).filter(x=>x.item_key!==key).concat(result.quick);
   renderQuick();renderLocationShots();
-  q('#sync').textContent='간편 체크 저장 완료 · 직원 간 공유 중';
+  q('#sync').textContent='간편 체크 저장 완료 · 공용 기록에 반영';
  }catch(e){
   try{
    const current=await api('visit',{q:'&id='+encodeURIComponent(visitId)});
@@ -823,7 +823,7 @@ async function saveI(k){
   const ix=S.v.items.findIndex(x=>x.item_key===k);
   if(ix>=0)S.v.items[ix]=j.item;else S.v.items.push(j.item);
   refreshCard(k);
-  q('#sync').textContent='기록 저장 완료 · 직원 간 공유 중';
+  q('#sync').textContent='점검 기록 저장 완료 · 공용 기록에 반영';
  }catch(e){alert(e.message)}finally{writing--}
 }
 function changedKeys(oldVisit,newVisit){
@@ -922,11 +922,11 @@ async function saveCaption(id){
   const j=await api('photo-caption',{method:'PATCH',body:{id,caption:field.value}});
   p.caption=j.photo.caption;
   field.value=p.caption;
-  q('#sync').textContent='사진 제목을 저장했습니다. 다른 직원과 공유됩니다.';
+  q('#sync').textContent='사진 제목을 공용 기록에 저장했습니다.';
  }catch(e){alert(e.message)}finally{writing--}
 }
 async function delP(id){
- if(!confirm('사진을 삭제할까요? 다른 직원의 화면에서도 사라집니다.'))return;
+ if(!confirm('사진을 삭제할까요? 공유 기록에서도 사라집니다.'))return;
  writing++;
  try{
   const p=S.v.photos.find(x=>x.id===id);
