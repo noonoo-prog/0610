@@ -29,6 +29,9 @@ jobs:
           grep -Eqi '^content-type: text/html' /tmp/sangeo-headers
           grep -q '<meta charset="utf-8">' /tmp/sangeo-page
           grep -q 'sangeo-inspection' /tmp/sangeo-page
+          grep -q 'downloadPhotoBook' /tmp/sangeo-page
+          grep -q 'id="photoalbum"' /tmp/sangeo-page
+          grep -q 'photo-download' /tmp/sangeo-page
           echo "Staff website is published and served as HTML"
       - name: Check API readiness and login protection
         shell: bash
@@ -40,6 +43,9 @@ jobs:
           test "$code" = "401"
           jq -e '.error | type == "string"' /tmp/blocked
           echo "Private building data is unavailable without a password session"
+          photo_code="$(curl --max-time 20 -sS -o /tmp/blocked-photo -w '%{http_code}' "$api?op=photo-download&id=00000000-0000-4000-8000-000000000001")"
+          test "$photo_code" = "401"
+          echo "Private photo bytes require a valid staff session"
       - name: Check cross-site browser preflight
         shell: bash
         run: |
