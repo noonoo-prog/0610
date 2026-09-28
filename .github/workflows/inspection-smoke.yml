@@ -32,6 +32,8 @@ jobs:
           grep -q 'downloadPhotoBook' /tmp/sangeo-page
           grep -q 'id="photoalbum"' /tmp/sangeo-page
           grep -q 'photo-download' /tmp/sangeo-page
+          grep -q 'id="fieldPhotos"' /tmp/sangeo-page
+          grep -q 'photo-category' /tmp/sangeo-page
           echo "Staff website is published and served as HTML"
       - name: Check API readiness and login protection
         shell: bash
@@ -46,6 +48,9 @@ jobs:
           photo_code="$(curl --max-time 20 -sS -o /tmp/blocked-photo -w '%{http_code}' "$api?op=photo-download&id=00000000-0000-4000-8000-000000000001")"
           test "$photo_code" = "401"
           echo "Private photo bytes require a valid staff session"
+          category_code="$(curl --max-time 20 -sS -o /tmp/blocked-category -w '%{http_code}' -X PATCH "$api?op=photo-category" -H 'Content-Type: application/json' -d '{}' )"
+          test "$category_code" = "401"
+          echo "Photo reassignment is restricted to authenticated staff"
       - name: Check cross-site browser preflight
         shell: bash
         run: |
