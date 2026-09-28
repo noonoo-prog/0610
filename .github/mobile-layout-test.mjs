@@ -101,6 +101,7 @@ try{
   assert(!await page.locator('#wsPane-onsite').isVisible(),'On-site page still visible');
   assert((await page.locator('.care-task').count())===15,'Cleaning checklist should contain 15 tasks');
   assert((await page.locator('#cycleRows .cycle-row').count())===9,'Manual cycles should contain nine items');
+  if (!(await page.locator('#cycleChecklist').evaluate(el=>el.open))) await page.locator('#cycleChecklist > summary').click();
   if(width===390){
    await page.locator('#careFrequency-m_site_leaves').selectOption('monthly');
    await page.locator('#careLast-m_site_leaves').fill('2026-09-01');
@@ -135,6 +136,7 @@ try{
    await page.locator('[id="cy-3.2.1"]').fill('12');
    await page.locator('[id="card-3.2.1"] .card-actions .pri').click();
    await page.waitForFunction(()=>document.getElementById('pcMonths-3.2.1')?.value==='12');
+   await page.getByRole('button',{name:'관리',exact:true}).click();
    await page.locator('[id="pcRow-3.2.1"] .cycle-buttons .ghost').click();
    assert(await page.locator('#wsPane-evaluation').isVisible(),'Cycle -> detail tab navigation broken');
    await page.getByRole('button',{name:'현장',exact:true}).click();
