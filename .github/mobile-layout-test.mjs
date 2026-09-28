@@ -37,12 +37,15 @@ try {
   if (sizes.document > width + 1) throw Error('Horizontal overflow at ' + width + 'px: ' + JSON.stringify(sizes));
   if (sizes.header > 88 || sizes.dock > 105) throw Error('Header or dock too tall: ' + JSON.stringify(sizes));
   if (sizes.textSize < 16 || sizes.buttonHeight < 44) throw Error('Form or rating target too small: ' + JSON.stringify(sizes));
-  if (!sizes.dockVisible || sizes.groupCount !== 5 || sizes.openGroups !== 1 || sizes.menuCount !== 5) throw Error('Mobile navigation/groups missing: ' + JSON.stringify(sizes));
+  if (!sizes.dockVisible || sizes.groupCount !== 5 || sizes.openGroups !== 1 || sizes.menuCount !== 7) throw Error('Mobile navigation/groups missing: ' + JSON.stringify(sizes));
   await page.locator('#mobileActions > summary').click();
   const menu = await page.locator('.mobile-more-menu').boundingBox();
   if (!menu || menu.x < -1 || menu.x + menu.width > width + 1) throw Error('More menu overflows viewport: ' + JSON.stringify(menu));
   await page.locator('#mobileActions > summary').click();
-  await page.getByRole('button', { name: '체크리스트', exact: true }).click();
+  await page.getByRole('button', { name: /사진 정리/ }).click();
+  if (!(await page.locator('#fieldDetails').evaluate(el => el.open))) throw Error('Photo inbox jump failed');
+  await page.locator('#mobileActions > summary').click();
+  await page.getByRole('button', { name: '간편 체크리스트', exact: true }).click();
   if (!(await page.locator('#quickChecklist').evaluate(el => el.open))) throw Error('Checklist jump failed');
   await page.locator('details.quick-group[data-group="3.5"] > summary').click();
   await page.locator('.quick-detail[data-key="3.5.4"]').click();
