@@ -368,7 +368,7 @@ function jumpWorkspace(tab,selector,prepare){
  if(target&&prepare)prepare(target);
  requestAnimationFrame(()=>target?.scrollIntoView({behavior:'smooth',block:'start'}));
 }
-function view(id){['setup','login','dash','visits','inspect','photoalbum','report','settings'].forEach(x=>q('#'+x).classList.toggle('hidden',x!==id))}
+function view(id){['setup','login','dash','visits','inspect','photoalbum','report','settings'].forEach(x=>q('#'+x).classList.toggle('hidden',x!==id));if(id==='visits'||id==='dash')window.scrollTo(0,0)}
 function goDash(){history.replaceState(null,'',location.pathname);view('dash')}
 async function boot(){try{let st=await api('status');if(!st.configured)return view('setup');if(!S.token)return view('login');S.me=await api('me');q('#logoutBtn').classList.remove('hidden');q('#manageBtn').classList.remove('hidden');q('#who').textContent='공용 점검 계정';await loadB();const url=new URL(location.href),buildingId=url.searchParams.get('building'),visitId=url.searchParams.get('visit');if(buildingId&&S.bs.some(x=>x.id===buildingId)){await openB(buildingId);if(visitId&&S.vs.some(x=>x.id===visitId))await openV(visitId)}else view('dash');startSync()}catch(e){alert(e.message);view('login')}}
 async function setup(){try{let j=await api('setup',{method:'POST',body:{code:q('#scode').value,password:q('#sp').value}});sessionStorage.setItem('sangeoInspectionToken',j.token);location.reload()}catch(e){alert(e.message)}}
@@ -1023,7 +1023,7 @@ function hasDraft(){
   return Object.entries(current).some(([f,v])=>String(v)!==String(base[f]));
  }));
 }
-async function openV(id){
+async function openV(id,{tab='onsite',scrollTop=true}={}){
  const j=await api('visit',{q:'&id='+id});
  S.v=j;S.b=j.building;
  fieldSelected.clear();
@@ -1031,14 +1031,17 @@ async function openV(id){
  q('#vt').textContent=S.b.name+' · '+j.visit.inspection_on;
  q('#sharedAddress').textContent=S.b.address||'주소 미등록 · 점검 목록에서 주소를 등록해 주세요.';
  render();renderFieldPhotos();renderLocationShots();renderCareSchedules();renderPeriods();
- setWorkspaceTab('onsite',false);
+ setWorkspaceTab(tab,false);
  q('#fieldDetails').open=(j.photos||[]).some(p=>p.item_key==='inbox');
  view('inspect');
+ if(scrollTop)window.scrollTo(0,0);
  q('#sync').textContent='공유 기록 · 15초 간격 자동 동기화';
 }
 async function reload(){
  if((hasDraft()||careHasDraft()||periodsDirty())&&!confirm('저장하지 않은 입력이 있습니다. 새로고침하면 사라집니다. 계속할까요?'))return;
- await openV(S.v.visit.id);
+ const y=window.scrollY,tab=currentWorkspaceTab;
+ await openV(S.v.visit.id,{tab,scrollTop:false});
+ window.scrollTo(0,y);
 }
 async function setS(k,v){
  if(PERIOD_KEYS.has(k)&&periodRowDirty(k))return alert('주기 체크리스트의 입력을 먼저 저장해 주세요.');
@@ -1111,7 +1114,17 @@ function startSync(){
    if(!q('#inspect').classList.contains('hidden'))await syncShared();
    else if(!q('#visits').classList.contains('hidden')&&S.b)await loadV();
    else if(!q('#dash').classList.contains('hidden'))await loadB();
-  }catch(e){if(!q('#inspect').classList.contains('hidden'))q('#sync').textContent='동기화 실패 · 공유 기록 새로고침을 눌러주세요.'}
+  }catch(e){
+   if(!q('#inspect').classList.contains('hidden')){
+    if(String(e.message||'').includes('점검 기록이 없습니다.')){
+     const bid=S.b?.id;S.v=null;
+     if(bid)history.replaceState(null,'',location.pathname+'?building='+encodeURIComponent(bid));
+     try{await loadV();}catch(ignore){}
+     view('visits');
+     alert('이 점검일이 다른 사용자에 의해 휴지통으로 이동됐습니다. 휴지통에서 복원할 수 있습니다.');
+    }else q('#sync').textContent='동기화 실패 · 새로고침으로 다시 확인해 주세요.';
+   }
+  }
  },15000);
 }
 async function img(f){
