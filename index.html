@@ -3,6 +3,139 @@ body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;back
 .quick-panel summary{cursor:pointer;font-weight:750;font-size:17px;padding:3px 0}.quick-panel .muted{line-height:1.5}.quick-group{border-top:1px solid #e8edf1;padding:8px 0}.quick-group summary{font-weight:700;font-size:14px;color:#344054;cursor:pointer;margin-bottom:4px}.quick-line{display:flex;align-items:center;gap:8px;min-height:48px;border-top:1px solid #f0f2f5;padding:5px 0}.quick-line:first-of-type{border-top:0}.quick-label{display:flex;align-items:center;flex:1;gap:8px;min-width:0;cursor:pointer}.quick-label input{width:21px;height:21px;flex-shrink:0;accent-color:#008cc0}.quick-label span{font-size:14px;word-break:keep-all}.quick-meta{color:#667085;font-size:11px;white-space:nowrap}.quick-line.done{background:#f6fcff}.quick-detail{flex-shrink:0;background:#eef2f4;font-size:12px;padding:6px 8px}.quick-progress{height:7px;background:#e5e7eb;border-radius:5px;overflow:hidden;margin:8px 0}.quick-progress i{display:block;background:#008cc0;height:100%;transition:width .2s}.quick-help{margin:8px 0;color:#667085;font-size:12px}.c{scroll-margin-top:85px}@media(max-width:620px){.quick-line{flex-wrap:wrap}.quick-label{flex-basis:100%}.quick-meta{margin-left:29px}.quick-detail{margin-left:auto}}
 @media(max-width:620px){.album-photos{grid-template-columns:1fr}.album-photo img{height:auto;max-height:420px}.toolbar button{flex:1 1 auto}}
 @media print{@page{size:A4;margin:13mm}header,.noprint,#setup,#login,#dash,#visits,#inspect,#settings{display:none!important}body{background:#fff}main{max-width:none;padding:0}.p{border:0;padding:0}.rphotos,.album-photos{grid-template-columns:repeat(2,minmax(0,1fr))}.album-photo{border-radius:0;padding:7px}.album-photo img{height:auto;max-height:87mm}.album-visit{break-before:auto}.album-photo figcaption strong{font-size:11pt}.album-photo figcaption small{font-size:9pt}}
+
+/* Mobile field workflow — legibility, touch targets and one-row bottom actions. */
+:root{color-scheme:light;--accent:#008cc0;--ink:#172632;--muted:#475467;--edge:#dbe4eb}
+body{color:var(--ink);-webkit-text-size-adjust:100%;overflow-x:hidden}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 15px;box-shadow:0 1px 4px #17263208}
+.header-brand{display:flex;flex-direction:column;min-width:0;gap:1px}
+.header-brand strong{font-size:16px;letter-spacing:-.02em;line-height:1.3}
+.header-brand small{font-size:12px;color:#526373}
+.header-brand strong span{font-size:12px;letter-spacing:.015em}
+.header-tools{display:flex;gap:6px;flex-shrink:0;align-items:center}
+.header-tools button{font-size:13px;font-weight:650}
+button,.camera-action{cursor:pointer;touch-action:manipulation}
+button:focus-visible,.camera-action:focus-within,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #65b8da;outline-offset:2px}
+.muted{color:var(--muted)}.ghost{background:#eaf0f4;color:#263849}.pri{background:#007eaa;color:#fff}
+.p,.c{box-shadow:0 1px 3px #15243408}
+.card-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}
+.card-heading h3{min-width:0;font-size:17px;line-height:1.4;letter-spacing:-.03em;overflow-wrap:anywhere}
+.card-heading h3 small{font-size:12px;color:#536a7e;letter-spacing:0}
+.status-pill{flex-shrink:0;padding:4px 8px;border-radius:100px;border:1px solid #dae4ed;background:#f3f6f9;color:#475467;font-weight:750;font-size:12px;white-space:nowrap}
+.status-pill.active{background:#e2f4fb;border-color:#91d0e6;color:#005e81}
+.card-meta{margin-top:5px}
+.photo-guide{margin-bottom:12px}
+.photo-guide summary{font-size:14px;font-weight:750;cursor:pointer}
+.photo-guide ul{margin-top:10px;font-size:14px;line-height:1.5}
+.card-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
+.card-actions button,.camera-action{display:inline-flex;align-items:center;justify-content:center;flex:1 1 120px;min-height:47px;padding:10px 12px;border-radius:10px;text-align:center;font-size:15px;font-weight:750}
+.camera-action{background:#eaf0f4;color:#263849}
+.st button.on{background:#005e81;color:white;border-color:#005e81}
+.thumb{min-width:0}.thumb img{display:block;border:1px solid #e1e7ed}
+.thumb .photo-remove{position:absolute;right:6px;top:6px;z-index:1;min-width:39px;min-height:39px;font-size:24px;color:#fff;background:#243849ee;border-radius:10px;padding:0}
+.photo-caption-input{margin-top:6px;font-size:14px;padding:8px}
+.thumb .photo-caption-save{position:static;width:100%;min-height:40px;margin-top:5px;font-size:13px;padding:8px}
+.inspection-group{min-width:0}
+.inspection-group>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;margin:16px 0 10px;padding:13px 14px;border-radius:12px;background:#eaf2f8;color:#19384b;font-size:18px;font-weight:800;cursor:pointer;list-style:none}
+.inspection-group>summary::after{content:"⌄";font-size:22px;line-height:1;color:#007eaa}
+.inspection-group[open]>summary::after{content:"⌃"}
+.inspection-group>summary::-webkit-details-marker{display:none}
+.inspection-group>summary .group-count{margin-left:auto;font-size:12px;color:#416071;white-space:nowrap}
+.c{scroll-margin-top:82px}
+.quick-label span{line-height:1.4}.quick-meta{color:#435365}
+.mobile-dock{display:none}
+@media(max-width:680px){
+ html{scroll-padding-top:73px}
+ body{background:#f1f5f8;font-size:16px;line-height:1.5}
+ header{top:0;gap:8px;min-height:59px;padding:8px 12px}
+ .header-brand strong{font-size:15px}
+ .header-brand strong span{font-size:10px}
+ .header-brand small{font-size:12px;line-height:1.3}
+ .header-tools button{min-height:42px;padding:7px 9px;font-size:12px}
+ main{max-width:100%;padding:10px 11px calc(100px + env(safe-area-inset-bottom));overflow-wrap:break-word}
+ .p,.c{border-radius:13px;margin-bottom:10px}
+ .p{padding:15px}.hd{padding:14px}.bd{padding:14px}
+ h1{font-size:23px;line-height:1.3;letter-spacing:-.035em;margin:8px 0 12px}
+ h2{font-size:18px;margin:18px 2px 10px}
+ h3{font-size:17px;line-height:1.43;margin:0 0 5px}
+ .muted{font-size:13px;line-height:1.48}
+ input,textarea,select{min-width:0;max-width:100%;min-height:46px;padding:11px 12px;font-size:16px;line-height:1.4;border-radius:10px;background:#fff}
+ input[type="checkbox"],input[type="file"]{min-height:0}
+ input[type="checkbox"]{accent-color:#007eaa}
+ textarea{min-height:112px;resize:vertical}
+ button{min-height:44px;padding:10px 12px;font-size:15px}
+ .row{grid-template-columns:minmax(0,1fr)}.stack{gap:10px}
+ .p>.stack>button.pri,.p>button.pri{width:100%;min-height:48px}
+ #login,#setup,#settings{max-width:560px;margin:15px auto}
+ #login .stack>button{min-height:50px;font-size:17px}
+ #who{margin:3px 0 14px}#searchBuilding{margin-top:7px}
+ #bl>.p,#vl>.p{min-height:77px;padding:16px;border-left:4px solid #008cc0;cursor:pointer}
+ #bl>.p h3,#vl>.p h3{font-size:17px}
+ #bl>.p .muted,#vl>.p .muted{font-size:14px;margin-top:5px}
+ #bt,#vt{font-size:21px;overflow-wrap:anywhere}
+ #bm,#sharedAddress{font-size:14px;word-break:break-word}
+ #vd{margin-bottom:5px}
+ #visits .p>div[style*="display:flex"] button{flex:1 1 130px;min-height:46px}
+ #inspect>.p:first-child{padding-bottom:12px}
+ #sync{font-size:12px;margin-top:6px}
+ #quickChecklist>summary{min-height:39px;font-size:17px}
+ .quick-panel{padding:14px}.quick-help{font-size:13px;line-height:1.5}
+ .quick-group summary{min-height:42px;padding:10px 3px;font-size:15px;line-height:1.5}
+ .quick-line{min-height:55px;padding:8px 4px;gap:8px}
+ .quick-label{flex:1 1 auto;min-width:0;gap:10px}
+ .quick-label input{width:23px;height:23px;flex:0 0 23px}
+ .quick-label span{font-size:15px;letter-spacing:-.02em}
+ .quick-meta{font-size:13px;white-space:normal;margin-left:33px}
+ .quick-detail{min-height:44px;padding:9px 12px;margin-left:auto;font-size:14px}
+ .quick-progress{height:9px}
+ .inspection-group>summary{min-height:59px;padding:13px 12px;margin:12px 0 9px;font-size:16px;line-height:1.3}
+ .inspection-group>summary .group-count{font-size:12px}
+ .inspection-group:not([open]){margin-bottom:9px}
+ .card-heading h3{font-size:17px}.card-heading h3 small{font-size:13px}
+ .status-pill{font-size:12px;padding:4px 7px}.card-meta{font-size:13px}
+ .photo-guide{padding:11px 12px;margin-bottom:11px}
+ .photo-guide summary{min-height:30px;font-size:14px}.photo-guide ul{font-size:14px;line-height:1.6}
+ .st{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+ .st button{width:100%;min-height:47px;padding:8px 2px;font-size:14px;line-height:1.3;border:1px solid #cbd5df;border-radius:9px;white-space:nowrap}
+ .st button.on::before{content:"✓ ";font-weight:900}
+ .card-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .card-actions button,.camera-action{min-width:0;min-height:49px;padding:10px 7px;font-size:15px}
+ .thumbs{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+ .thumb img{height:auto;aspect-ratio:4/3;object-fit:cover}
+ .thumb .photo-remove{min-width:43px;min-height:43px;font-size:25px}
+ .photo-caption-input{min-height:46px;font-size:16px}
+ .thumb .photo-caption-save{min-height:43px;font-size:14px}
+ .toolbar{display:none}
+ .mobile-dock{display:flex;align-items:center;position:fixed;z-index:8;left:0;right:0;bottom:0;gap:8px;padding:10px max(12px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:#fff;border-top:1px solid #dbe3e9;box-shadow:0 -4px 20px #18212b17}
+ .mobile-dock>button,.mobile-more>summary{display:flex;justify-content:center;align-items:center;min-height:48px;padding:9px 5px;border-radius:10px;font-size:14px;font-weight:750;white-space:nowrap}
+ .mobile-dock .dock-main{flex:1 1 0;min-width:0;background:#007eaa;color:#fff}
+ .mobile-more{flex:0 0 80px;position:relative}
+ .mobile-more>summary{list-style:none;cursor:pointer;background:#eaf0f4;color:#263849}
+ .mobile-more>summary::-webkit-details-marker{display:none}
+ .mobile-more[open]>summary{background:#d5e9f4}
+ .mobile-more-menu{position:absolute;right:0;bottom:calc(100% + 15px);width:min(310px,calc(100vw - 22px));display:grid;gap:5px;padding:9px;background:white;border:1px solid #d5dfe7;border-radius:13px;box-shadow:0 8px 30px #17263230}
+ .mobile-more-menu button{min-height:47px;font-size:15px;text-align:left;background:#f2f6f8;color:#263849}
+ .album-actions{gap:8px}.album-actions button{flex:1 1 130px}
+ .album-back-fixed{bottom:calc(10px + env(safe-area-inset-bottom))}
+ .album-photos{grid-template-columns:1fr}.album-photo img{height:auto;max-height:55vh}
+ .album-photo figcaption strong{font-size:15px}.album-photo figcaption small{font-size:13px}
+ .rphotos{grid-template-columns:minmax(0,1fr)}.rphotos img{max-height:none}
+ .c{scroll-margin-top:73px}#quickChecklist{scroll-margin-top:74px}
+}
+@media(max-width:350px){
+ .header-brand strong span{display:none}
+ .header-tools button{font-size:11px;padding:7px}
+ .st{gap:5px}.st button{font-size:13px}
+ .mobile-more{flex-basis:72px}.mobile-dock>button,.mobile-more>summary{font-size:13px}
+}
+@media print{
+ .mobile-dock{display:none!important}
+ .inspection-group,.inspection-group:not([open]){display:block!important}
+ .inspection-group>summary{display:none!important}
+ .inspection-group>.c{display:block}
+ .photo-guide{display:none}
+}
+
 </style></head><body><header><div class="header-brand"><strong>SANGEO <span>ARCHITECTURE</span></strong><small>건축물 정기점검 · 직원 전용</small></div><div class="header-tools noprint"><button id="manageBtn" class="ghost hidden" onclick="view('settings')">설정</button><button id="logoutBtn" class="ghost hidden" onclick="logout()">로그아웃</button></div></header><main>
 <section id="settings" class="p hidden"><button class="ghost" onclick="view('dash')">← 건물 목록</button><h1>관리자 · 비밀번호 관리</h1><p class="muted">변경 즉시 해당 구분의 다른 로그인 세션은 만료됩니다. 비밀번호는 서버에서 안전하게 확인합니다.</p><div class="stack"><select id="passKind"><option value="staff">직원 공통 비밀번호</option><option value="admin">관리자 비밀번호</option></select><input id="newPass" type="password" autocomplete="new-password" placeholder="새 비밀번호 (10자 이상)"><input id="newPassConfirm" type="password" autocomplete="new-password" placeholder="새 비밀번호 확인"><button class="pri" onclick="changePassword()">비밀번호 변경</button></div></section><section id="setup" class="p hidden"><h1>최초 설정</h1><div class="stack"><input id="scode" placeholder="초기 설정 코드"><input id="ap" type="password" placeholder="관리자 비밀번호 10자 이상"><input id="sp" type="password" placeholder="직원 공통 비밀번호 10자 이상"><button class="pri" onclick="setup()">설정 완료</button></div></section>
 <section id="login" class="p hidden"><h1>직원 접속</h1><p class="muted">비밀번호만 입력하면 공유 점검 기록을 이용할 수 있습니다.</p><div class="stack"><input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()"><button class="pri" onclick="login()">접속</button></div></section>
