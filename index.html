@@ -6,9 +6,9 @@ body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;back
 <section id="settings" class="p hidden"><button class="ghost" onclick="view('dash')">← 건물 목록</button><h1>관리자 · 비밀번호 관리</h1><p class="muted">변경 즉시 해당 구분의 다른 로그인 세션은 만료됩니다. 비밀번호는 서버에서 안전하게 확인합니다.</p><div class="stack"><select id="passKind"><option value="staff">직원 공통 비밀번호</option><option value="admin">관리자 비밀번호</option></select><input id="newPass" type="password" autocomplete="new-password" placeholder="새 비밀번호 (10자 이상)"><input id="newPassConfirm" type="password" autocomplete="new-password" placeholder="새 비밀번호 확인"><button class="pri" onclick="changePassword()">비밀번호 변경</button></div></section><section id="setup" class="p hidden"><h1>최초 설정</h1><div class="stack"><input id="scode" placeholder="초기 설정 코드"><input id="ap" type="password" placeholder="관리자 비밀번호 10자 이상"><input id="sp" type="password" placeholder="직원 공통 비밀번호 10자 이상"><button class="pri" onclick="setup()">설정 완료</button></div></section>
 <section id="login" class="p hidden"><h1>직원 접속</h1><p class="muted">비밀번호만 입력하면 공유 점검 기록을 이용할 수 있습니다.</p><div class="stack"><input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()"><button class="pri" onclick="login()">접속</button></div></section>
 <section id="dash" class="hidden"><div class="p"><h1>공유 건축물</h1><p class="muted">직원 모두 같은 건물과 점검 기록을 사용합니다. 주소로 검색하거나 선택하세요.</p><div id="who" class="muted"></div><label>건축물명 또는 주소 검색<input id="searchBuilding" type="search" placeholder="예: 퇴계로 264" oninput="renderBuildings()"></label><div style="height:9px"></div><button class="pri" onclick="q('#add').classList.toggle('hidden')">+ 건물 등록 / 주소 찾기</button><div id="add" class="stack hidden" style="margin-top:10px"><input id="bn" placeholder="건축물명"><input id="ba" placeholder="건축물 주소 (필수)"><div class="row"><input id="bu" placeholder="주용도"><input id="bd" type="date"></div><div class="muted">이미 등록된 주소라면 새 건물을 만들지 않고 기존 공유 건물로 이동합니다.</div><button class="pri" onclick="addB()">등록하고 공유 건물 열기</button></div></div><div id="bl"></div></section>
-<section id="visits" class="hidden"><div class="p"><button class="ghost" onclick="goDash()">← 건물 목록</button><h1 id="bt"></h1><div id="bm" class="muted"></div><div id="addressMissing" class="guide hidden" style="margin-top:9px">이 건물은 아직 주소가 없습니다. 아래 ‘주소 등록/수정’을 눌러 기존 점검 기록을 유지한 채 주소를 등록하세요.</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin:12px 0"><button class="pri" onclick="shareB()">🔗 건물 링크 공유</button><button class="ghost" onclick="editB()">주소 등록 / 수정</button></div><div id="editBuilding" class="stack hidden" style="margin-bottom:12px"><input id="ebn" placeholder="건축물명"><input id="eba" placeholder="건축물 주소 (필수)"><div class="row"><input id="ebu" placeholder="주용도"><input id="ebd" type="date"></div><button class="pri" onclick="saveB()">이 건물에 주소 저장</button></div><p class="muted">같은 건물·같은 날짜의 점검은 직원 모두 하나의 기록으로 들어갑니다.</p><div class="row"><input id="vd" type="date"><button class="pri" onclick="newV()">선택한 날짜의 공유 점검 열기</button></div></div><div id="vl"></div><div class="p"><button class="pri" onclick="downloadPhotoBook('building')">이 건물 사진대장 파일 다운로드</button><p id="albumStatusBuilding" class="muted">HTML 파일 한 개에 사진과 제목을 모두 담습니다. 파일을 열어 PDF로 저장할 수 있습니다.</p></div></section>
-<section id="inspect" class="hidden"><div class="p noprint"><button class="ghost" onclick="view('visits')">← 점검 목록</button><h1 id="vt"></h1><div class="muted" id="sharedAddress"></div><div class="bar" style="margin-top:9px"><i id="bar"></i></div><div id="prog" class="muted"></div><div id="sync" class="muted">직원 공통 기록 · 15초 간격 자동 동기화</div></div><div id="items"></div><div class="toolbar noprint"><button class="ghost" onclick="reload()">새로고침</button><button class="ghost" onclick="shareB()">링크 공유</button><button class="pri" onclick="showPhotoAlbum()">사진대장 보기</button><button class="pri" onclick="downloadPhotoBook('visit')">사진대장 파일 다운로드</button><button class="ghost" onclick="report()">전체 보고서/PDF</button></div></section>
-<section id="photoalbum" class="hidden"><div class="p"><div class="album-actions noprint"><button class="ghost" onclick="view('inspect')">← 점검으로</button><button class="pri" onclick="downloadPhotoBook('visit')">사진대장 파일 다운로드</button><button class="ghost" onclick="printPhotoAlbum()">PDF 저장 / 인쇄</button></div><p id="albumStatus" class="muted noprint"></p><div id="albumContent"></div></div></section>
+<section id="visits" class="hidden"><div class="p"><button class="ghost" onclick="goDash()">← 건물 목록</button><h1 id="bt"></h1><div id="bm" class="muted"></div><div id="addressMissing" class="guide hidden" style="margin-top:9px">이 건물은 아직 주소가 없습니다. 아래 ‘주소 등록/수정’을 눌러 기존 점검 기록을 유지한 채 주소를 등록하세요.</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin:12px 0"><button class="pri" onclick="shareB()">🔗 건물 링크 공유</button><button class="ghost" onclick="editB()">주소 등록 / 수정</button></div><div id="editBuilding" class="stack hidden" style="margin-bottom:12px"><input id="ebn" placeholder="건축물명"><input id="eba" placeholder="건축물 주소 (필수)"><div class="row"><input id="ebu" placeholder="주용도"><input id="ebd" type="date"></div><button class="pri" onclick="saveB()">이 건물에 주소 저장</button></div><p class="muted">같은 건물·같은 날짜의 점검은 직원 모두 하나의 기록으로 들어갑니다.</p><div class="row"><input id="vd" type="date"><button class="pri" onclick="newV()">선택한 날짜의 공유 점검 열기</button></div></div><div id="vl"></div><div class="p"><button class="pri" onclick="downloadPhotoBook('building')">이 건물 사진 JPG/PNG ZIP 다운로드</button><p id="albumStatusBuilding" class="muted">사진을 점검항목명+순번으로 묶어 JPG/PNG 파일이 담긴 ZIP 한 개로 저장합니다.</p></div></section>
+<section id="inspect" class="hidden"><div class="p noprint"><button class="ghost" onclick="view('visits')">← 점검 목록</button><h1 id="vt"></h1><div class="muted" id="sharedAddress"></div><div class="bar" style="margin-top:9px"><i id="bar"></i></div><div id="prog" class="muted"></div><div id="sync" class="muted">직원 공통 기록 · 15초 간격 자동 동기화</div></div><div id="items"></div><div class="toolbar noprint"><button class="ghost" onclick="reload()">새로고침</button><button class="ghost" onclick="shareB()">링크 공유</button><button class="pri" onclick="showPhotoAlbum()">사진대장 보기</button><button class="pri" onclick="downloadPhotoBook('visit')">사진 JPG/PNG ZIP 다운로드</button><button class="ghost" onclick="report()">전체 보고서/PDF</button></div></section>
+<section id="photoalbum" class="hidden"><div class="p"><div class="album-actions noprint"><button class="ghost" onclick="view('inspect')">← 점검으로</button><button class="pri" onclick="downloadPhotoBook('visit')">사진 JPG/PNG ZIP 다운로드</button><button class="ghost" onclick="printPhotoAlbum()">PDF 저장 / 인쇄</button></div><p id="albumStatus" class="muted noprint"></p><div id="albumContent"></div></div></section>
 <section id="report" class="hidden"><div class="p"><button class="ghost noprint" onclick="view('inspect')">← 점검으로</button><button class="pri noprint" onclick="print()" style="float:right">PDF 저장/인쇄</button><div id="rb"></div></div></section>
 </main><script>
 const legacyToken=localStorage.getItem('sgToken');
@@ -207,7 +207,30 @@ function startSync(){
   }catch(e){if(!q('#inspect').classList.contains('hidden'))q('#sync').textContent='동기화 실패 · 공유 기록 새로고침을 눌러주세요.'}
  },15000);
 }
-async function img(f){let im=await createImageBitmap(f),s=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);let b=await new Promise(r=>c.toBlob(r,'image/jpeg',.75)),u=new Uint8Array(await b.arrayBuffer()),x='';for(let i=0;i<u.length;i+=8192)x+=String.fromCharCode(...u.subarray(i,i+8192));return{base64:btoa(x),mime:'image/jpeg'}}
+async function img(f){
+ const bitmap=await createImageBitmap(f);
+ const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+ if(!ctx)throw Error('사진을 처리할 수 없습니다.');
+ let factor=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));
+ const mime=f.type==='image/png'?'image/png':'image/jpeg';
+ let blob=null;
+ for(let attempt=0;attempt<8;attempt++){
+  canvas.width=Math.max(1,Math.round(bitmap.width*factor));
+  canvas.height=Math.max(1,Math.round(bitmap.height*factor));
+  ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
+  blob=await new Promise(resolve=>canvas.toBlob(resolve,mime,mime==='image/jpeg'?0.82:undefined));
+  if(!blob)throw Error('사진을 저장 가능한 형식으로 만들지 못했습니다.');
+  if(blob.size<=5000000)break;
+  factor*=0.8;
+ }
+ if(bitmap.close)bitmap.close();
+ if(!blob||blob.size>5000000)throw Error('사진 용량이 5MB를 초과했습니다.');
+ const data=new Uint8Array(await blob.arrayBuffer());
+ let encoded='';
+ for(let offset=0;offset<data.length;offset+=8192)
+  encoded+=String.fromCharCode(...data.subarray(offset,offset+8192));
+ return {base64:btoa(encoded),mime};
+}
 async function up(k,i){
  const f=i.files[0];if(!f)return;
  writing++;
@@ -355,6 +378,64 @@ function safeDownloadName(name){
  return String(name||'건축물').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').replace(/\s+/g,'_').slice(0,65)||'건축물';
 }
 let albumBusy=false;
+// ZIP "store" method: JPG/PNG are already compressed; no third-party JS required.
+const CRC32_TABLE=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let j=0;j<8;j++)c=c&1?(0xedb88320^(c>>>1)):(c>>>1);t[n]=c>>>0;}return t;})();
+function crc32(data){let crc=0xffffffff;for(const byte of data)crc=CRC32_TABLE[(crc^byte)&255]^(crc>>>8);return(crc^0xffffffff)>>>0;}
+function buildPhotoZIP(entries){
+ if(!entries.length)throw Error('내려받을 사진이 없습니다.');
+ if(entries.length>65535)throw Error('사진 파일이 너무 많습니다. 점검일별로 나누어 내려받아 주세요.');
+ const encode=new TextEncoder(),parts=[],central=[];
+ let offset=0,directoryBytes=0;
+ for(const entry of entries){
+  const name=encode.encode(entry.name),data=entry.bytes;
+  if(name.length>65535||data.length>0xffffffff)throw Error('ZIP 파일에 넣을 사진 크기가 너무 큽니다.');
+  const crc=crc32(data),local=new Uint8Array(30+name.length),l=new DataView(local.buffer);
+  l.setUint32(0,0x04034b50,true);l.setUint16(4,20,true);l.setUint16(6,0x0800,true);
+  l.setUint16(8,0,true);l.setUint16(10,0,true);l.setUint16(12,33,true);
+  l.setUint32(14,crc,true);l.setUint32(18,data.length,true);l.setUint32(22,data.length,true);
+  l.setUint16(26,name.length,true);local.set(name,30);
+  parts.push(local,data);
+  const center=new Uint8Array(46+name.length),c=new DataView(center.buffer);
+  c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);
+  c.setUint16(8,0x0800,true);c.setUint16(10,0,true);c.setUint16(12,0,true);c.setUint16(14,33,true);
+  c.setUint32(16,crc,true);c.setUint32(20,data.length,true);c.setUint32(24,data.length,true);
+  c.setUint16(28,name.length,true);c.setUint32(42,offset,true);center.set(name,46);
+  central.push(center);directoryBytes+=center.length;offset+=local.length+data.length;
+ }
+ if(offset+directoryBytes>0xffffffff)throw Error('ZIP 크기 제한을 초과했습니다. 점검일별로 내려받아 주세요.');
+ const footer=new Uint8Array(22),e=new DataView(footer.buffer);
+ e.setUint32(0,0x06054b50,true);e.setUint16(8,entries.length,true);e.setUint16(10,entries.length,true);
+ e.setUint32(12,directoryBytes,true);e.setUint32(16,offset,true);
+ return new Blob([...parts,...central,footer],{type:'application/zip'});
+}
+function safePhotoName(name){
+ return String(name||'점검사진').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().replace(/[. ]+$/g,'').slice(0,90)||'점검사진';
+}
+async function fetchZIPPhoto(photo){
+ const response=await fetch(base+'?op=photo-download&id='+encodeURIComponent(photo.id),{
+  method:'GET',headers:{Authorization:'Bearer '+S.token}
+ });
+ if(!response.ok){
+  const details=await response.json().catch(()=>({}));
+  throw Error((details.error||'사진 다운로드에 실패했습니다.')+' ('+(photo.original_name||photo.item_key)+')');
+ }
+ let image=await response.blob();
+ if(image.size<16||image.size>5500000)throw Error('사진 크기가 올바르지 않습니다: '+(photo.original_name||photo.item_key));
+ let extension;
+ if(image.type==='image/jpeg')extension='jpg';
+ else if(image.type==='image/png')extension='png';
+ else if(image.type==='image/webp'){
+  const bitmap=await createImageBitmap(image),canvas=document.createElement('canvas');
+  canvas.width=bitmap.width;canvas.height=bitmap.height;
+  const ctx=canvas.getContext('2d');if(!ctx)throw Error('WebP 사진 변환을 지원하지 않는 브라우저입니다.');
+  ctx.drawImage(bitmap,0,0);
+  image=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+  if(bitmap.close)bitmap.close();
+  if(!image||image.type!=='image/png')throw Error('WebP 사진을 PNG로 변환하지 못했습니다.');
+  extension='png';
+ }else throw Error('지원하지 않는 사진 형식입니다: '+image.type);
+ return {bytes:new Uint8Array(await image.arrayBuffer()),extension};
+}
 async function downloadPhotoBook(scope){
  if(albumBusy)return;
  if(!S.b&&!S.v)return alert('건축물을 먼저 선택하세요.');
@@ -363,7 +444,7 @@ async function downloadPhotoBook(scope){
   let docs=[];
   if(scope==='building'){
    await loadV();
-   if(S.vs.length>=150)throw Error('점검일이 150건 이상입니다. 누락 방지를 위해 점검일별로 다운로드해 주세요.');
+   if(S.vs.length>=150)throw Error('점검 기록이 150건 이상입니다. 점검일별로 내려받아 주세요.');
    for(let i=0;i<S.vs.length;i++){
     albumMessage('점검 기록 확인 중 '+(i+1)+'/'+S.vs.length);
     docs.push(await currentAlbumDoc(S.vs[i].id));
@@ -372,34 +453,49 @@ async function downloadPhotoBook(scope){
    if(!S.v)return alert('점검을 먼저 선택하세요.');
    docs=[await currentAlbumDoc(S.v.visit.id)];
   }
-  docs=docs.filter(d=>d.photos.length);
+  docs=docs.filter(d=>d.photos?.length).sort((a,b)=>a.visit.inspection_on.localeCompare(b.visit.inspection_on));
   if(!docs.length)return alert('저장된 사진이 없습니다. 현장 사진을 먼저 올려주세요.');
-  const photos=docs.flatMap(d=>d.photos),sources=new Map();
-  let bytes=0;
-  for(let i=0;i<photos.length;i++){
-   const p=photos[i];
-   albumMessage('사진 취합 중 '+(i+1)+'/'+photos.length+'장 · '+p.item_key);
-   const file=await photoDataURL(p);
-   bytes+=file.bytes;
-   if(bytes>110*1024*1024)throw Error('사진 용량이 110MB를 넘었습니다. 점검일별로 나눠 내려받아 주세요.');
-   sources.set(p.id,file.data);
+  const catalog=new Map(CATALOG.map((x,i)=>[x.key,{title:x.title,index:i}]));
+  const entries=[],used=new Set(),expected=docs.reduce((sum,doc)=>sum+doc.photos.length,0);
+  let count=0,totalBytes=0;
+  for(const doc of docs){
+   const grouped=new Map();
+   for(const photo of doc.photos){
+    if(!grouped.has(photo.item_key))grouped.set(photo.item_key,[]);
+    grouped.get(photo.item_key).push(photo);
+   }
+   const keys=[...grouped.keys()].sort((a,b)=>(catalog.get(a)?.index??9999)-(catalog.get(b)?.index??9999));
+   for(const key of keys){
+    const photos=grouped.get(key).sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||'')||a.id.localeCompare(b.id));
+    const basename=safePhotoName(catalog.get(key)?.title||key);
+    for(let i=0;i<photos.length;i++){
+     const photo=photos[i];
+     albumMessage('사진 JPG/PNG 취합 중 '+(++count)+' / '+expected+'장');
+     const file=await fetchZIPPhoto(photo);
+     totalBytes+=file.bytes.length;
+     if(totalBytes>110*1024*1024)throw Error('사진 용량이 110MB를 넘었습니다. 점검일별로 나누어 내려받아 주세요.');
+     const prefix=scope==='building'?doc.visit.inspection_on+'/':'';
+     let filename=prefix+basename+(i+1)+'.'+file.extension;
+     if(used.has(filename))filename=prefix+basename+'_'+key+'_'+(i+1)+'.'+file.extension;
+     if(used.has(filename))throw Error('사진 파일명이 중복되었습니다. 점검항목을 확인해 주세요.');
+     used.add(filename);
+     entries.push({name:filename,bytes:file.bytes});
+    }
+   }
   }
-  const content=standaloneAlbum(docs,sources);
-  const blob=new Blob([content],{type:'text/html;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const building=docs[0].building,tail=scope==='building'?'전체사진':docs[0].visit.inspection_on;
-  const anchor=document.createElement('a');
+  const archive=buildPhotoZIP(entries);
+  const url=URL.createObjectURL(archive),anchor=document.createElement('a');
+  const tail=scope==='building'?'전체점검사진':docs[0].visit.inspection_on+'_점검사진';
   anchor.href=url;
-  anchor.download=safeDownloadName(building.name)+'_'+tail+'_점검사진대장.html';
+  anchor.download=safeDownloadName(docs[0].building.name)+'_'+tail+'.zip';
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
   setTimeout(()=>URL.revokeObjectURL(url),60000);
-  albumMessage('완료 · 사진 '+photos.length+'장 / 한 파일로 다운로드했습니다. 파일을 열어 PDF 저장도 가능합니다.');
+  albumMessage('완료 · '+entries.length+'장의 JPG/PNG 사진을 ZIP 한 개로 다운로드했습니다.');
  }catch(e){albumMessage('다운로드 실패: '+e.message);alert(e.message);}
  finally{albumBusy=false;}
 }
-
 function report(){let b=S.v.building||S.b,v=S.v.visit,h='<h1>건축물 정기점검 현장 보고서</h1><p><b>'+E(b.name)+'</b><br>'+E(b.address||'')+'<br>점검일 '+E(v.inspection_on)+' · 점검자 '+E(v.inspector||'')+'</p>';gs.forEach(g=>{h+='<h2>'+g[0]+' '+g[1]+'</h2>';g[2].forEach(x=>{let d=D(x[0]),ps=P(x[0]);h+='<div class="report"><h3>'+x[0]+' '+E(x[1])+' — '+E(d.result||'미평가')+'</h3>'+((d.management&&Object.values(d.management).some(Boolean))?'<p class="muted">위치: '+E(d.management.location||'-')+(d.management.other?'('+E(d.management.other)+')':'')+' · 관리: '+E(d.management.action||'-')+' · 점검주기: '+E(d.management.cycle??'-')+'개월 · 교체시기: '+E(d.management.replace_year??'-')+'년 · 근거: '+E(d.management.basis||'-')+'</p>':'')+'<p>'+E(d.note||'').replace(/\n/g,'<br>')+'</p><div class="rphotos">'+ps.map(p=>'<figure style="margin:4px"><img src="'+E(p.url)+'" alt="'+E(p.caption||x[1])+'"><figcaption class="muted">'+E(p.caption||x[0]+' '+x[1])+'</figcaption></figure>').join('')+'</div></div>'})});q('#rb').innerHTML=h;view('report')}
 boot();
 </script></body></html>
