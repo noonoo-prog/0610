@@ -228,6 +228,32 @@ button:focus-visible,.camera-action:focus-within,input:focus-visible,textarea:fo
 }
 @media(max-width:350px){.linked-quick{font-size:11px;max-width:94px;padding:6px}.quick-photo-link{font-size:11px;padding:6px}}
 @media print{.linked-quick,.quick-photo-link{display:none}}
+
+.cycle-panel{scroll-margin-top:74px;border-color:#b2d4e4;background:linear-gradient(#f4faff,#fff 135px)}
+#cycleChecklist>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:49px;font-size:17px;font-weight:800}
+#cycleChecklist>summary::-webkit-details-marker{display:none}
+#cycleChecklist>summary::before{content:"›";font-size:23px;color:#008cc0}
+#cycleChecklist[open]>summary::before{transform:rotate(90deg)}
+#cycleChecklist>summary span{flex:1}
+#cycleCount{border-radius:30px;padding:5px 9px;background:#e0f3fa;color:#006e90;font-size:12px;white-space:nowrap}
+#cycleRows{display:grid;gap:8px;margin:10px 0}
+.cycle-row{padding:11px;border:1px solid #dce5ec;border-radius:11px;background:#fff;scroll-margin-top:80px}
+.cycle-row.recorded{border-color:#a7d9c3;background:#f7fcf9}
+.cycle-row.edited{border-color:#d6ab60;background:#fffaf0}
+.cycle-head{display:flex;justify-content:space-between;align-items:center;gap:9px;margin-bottom:9px}
+.cycle-head b{font-size:15px;line-height:1.4}
+.cycle-head small{white-space:nowrap;color:#586776;font-size:12px;border-radius:6px;padding:4px 6px;background:#eff3f6}
+.cycle-row.recorded .cycle-head small{color:#196344;background:#e1f4e8}
+.cycle-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.cycle-fields label{min-width:0;color:#465668;font-size:12px;font-weight:700}
+.cycle-fields select,.cycle-fields input{box-sizing:border-box;width:100%;min-width:0;margin-top:4px}
+.cycle-buttons{display:flex;gap:8px;margin-top:10px}
+.cycle-buttons button{min-height:45px;flex:1 1 0}
+.cycle-unsaved{display:none;color:#865913;font-size:12px;margin:7px 0 0}
+.cycle-row.edited .cycle-unsaved{display:block}
+@media(max-width:680px){.cycle-panel{padding:14px}#cycleChecklist>summary{font-size:16px}.cycle-fields{grid-template-columns:1fr 1fr}.cycle-fields label:first-child{grid-column:1/-1}.cycle-fields input,.cycle-fields select{font-size:16px;min-height:46px}.cycle-head b{font-size:15px}}
+@media(max-width:350px){.cycle-fields{gap:5px}.cycle-head b{font-size:14px}}
+@media print{.cycle-panel{display:none!important}}
 </style></head><body><header><div class="header-brand"><strong>SANGEO <span>ARCHITECTURE</span></strong><small>건축물 정기점검 · 공용 접속</small></div><div class="header-tools noprint"><button id="manageBtn" class="ghost hidden" onclick="view('settings')">설정</button><button id="logoutBtn" class="ghost hidden" onclick="logout()">로그아웃</button></div></header><main>
 <section id="settings" class="p hidden"><button class="ghost" onclick="view('dash')">← 건물 목록</button><h1>공용 접속 비밀번호</h1><p class="muted">관리자·직원 구분 없이 같은 비밀번호를 사용합니다. 변경하려면 현재 비밀번호가 필요하며, 변경 후 다른 기기의 로그인은 만료됩니다.</p><div class="stack"><input id="currentPass" type="password" autocomplete="current-password" placeholder="현재 비밀번호"><input id="newPass" type="password" autocomplete="new-password" placeholder="새 비밀번호 (8자 이상)"><input id="newPassConfirm" type="password" autocomplete="new-password" placeholder="새 비밀번호 확인"><button class="pri" onclick="changePassword()">공용 비밀번호 변경</button></div></section><section id="setup" class="p hidden"><h1>최초 설정</h1><div class="stack"><input id="scode" placeholder="초기 설정 코드"><input id="sp" type="password" autocomplete="new-password" placeholder="공용 비밀번호 (8자 이상)"><button class="pri" onclick="setup()">설정 완료</button></div></section>
 <section id="login" class="p hidden"><h1>공용 접속</h1><p class="muted">공통 비밀번호 하나로 건물과 점검 기록을 이용합니다.</p><div class="stack"><input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()"><button class="pri" onclick="login()">접속</button></div></section>
@@ -250,7 +276,7 @@ button:focus-visible,.camera-action:focus-within,input:focus-visible,textarea:fo
 <details id="fieldDetails"><summary>사진 분류 · 항목 변경 <span id="fieldTotal">전체 0장</span></summary>
 <div class="field-filters"><label>보기<select id="fieldFilter" onchange="renderFieldPhotos()"><option value="unfiled">미분류만</option><option value="all">모든 사진</option></select></label><button class="ghost" onclick="selectFieldVisible(true)">전체 선택</button><button class="ghost" onclick="selectFieldVisible(false)">선택 해제</button></div>
 <div class="field-bulk"><label>사진을 이동할 항목<select id="fieldTarget"></select></label><button class="pri" onclick="assignFieldPhotos()">선택 사진 항목 지정</button><span id="fieldSelected" class="muted">0장 선택</span></div>
-<div class="field-grid" id="fieldGrid"></div></details></div><div class="p noprint quick-panel"><details id="quickChecklist" open><summary>현장 간편 체크리스트 <span id="quickCount" class="muted">확인 0 / 16</span></summary><p class="quick-help">장소별 촬영 체크와 연결됩니다. 현장 확인·촬영 여부를 각각 기록하며, 정식 평가 결과는 별도로 작성합니다.</p><div class="quick-progress"><i id="quickBar"></i></div><div id="quickRows"></div></details></div><div id="items"></div><div class="toolbar noprint"><button class="ghost" onclick="reload()">새로고침</button><button class="ghost" onclick="shareB()">링크 공유</button><button class="pri" onclick="showPhotoAlbum()">사진대장 보기</button><button class="pri" onclick="downloadPhotoBook('visit')">사진 JPG/PNG ZIP 다운로드</button><button class="ghost" onclick="report()">전체 보고서/PDF</button></div><div class="mobile-dock noprint"><button class="dock-main" onclick="jumpToLocationPhotos()">촬영 체크</button><button class="dock-main" onclick="jumpToCare()">청소 주기</button><details id="mobileActions" class="mobile-more"><summary>더보기</summary><div class="mobile-more-menu"><button onclick="q('#mobileActions').open=false;jumpToFieldPhotos()">사진 업로드·정리 <span id="fieldDock"></span></button><button onclick="q('#mobileActions').open=false;jumpToQuick()">간편 체크리스트</button><button onclick="q('#mobileActions').open=false;showPhotoAlbum()">사진대장 보기</button><button onclick="q('#mobileActions').open=false;view('visits')">← 점검 목록</button><button onclick="q('#mobileActions').open=false;reload()">새로고침</button><button onclick="q('#mobileActions').open=false;shareB()">링크 공유</button><button onclick="q('#mobileActions').open=false;downloadPhotoBook('visit')">사진 ZIP 다운로드</button><button onclick="q('#mobileActions').open=false;report()">전체 보고서 / PDF</button></div></details></div></section>
+<div class="field-grid" id="fieldGrid"></div></details></div><div class="p noprint quick-panel"><details id="quickChecklist" open><summary>현장 간편 체크리스트 <span id="quickCount" class="muted">확인 0 / 16</span></summary><p class="quick-help">장소별 촬영 체크와 연결됩니다. 현장 확인·촬영 여부를 각각 기록하며, 정식 평가 결과는 별도로 작성합니다.</p><div class="quick-progress"><i id="quickBar"></i></div><div id="quickRows"></div></details></div><div class="p noprint cycle-panel" id="cyclePanel"><details id="cycleChecklist"><summary><span>점검주기·교체시기 체크리스트</span><strong id="cycleCount">작성 0 / 9</strong></summary><p class="muted">매뉴얼의 기능 유지 3.2.1~3.2.9 항목입니다. 해당 항목의 관리 구분과 점검주기 또는 교체시기를 기록하세요.</p><div id="cycleRows"></div><p class="check-note">상세 점검표와 동일한 기록입니다. 주기 작성은 점검 결과의 ‘양호’ 판정이나 법정 점검 이행을 의미하지 않습니다.</p></details></div><div id="items"></div><div class="toolbar noprint"><button class="ghost" onclick="reload()">새로고침</button><button class="ghost" onclick="shareB()">링크 공유</button><button class="pri" onclick="showPhotoAlbum()">사진대장 보기</button><button class="pri" onclick="downloadPhotoBook('visit')">사진 JPG/PNG ZIP 다운로드</button><button class="ghost" onclick="report()">전체 보고서/PDF</button></div><div class="mobile-dock noprint"><button class="dock-main" onclick="jumpToLocationPhotos()">촬영 체크</button><button class="dock-main" onclick="jumpToCare()">청소 주기</button><details id="mobileActions" class="mobile-more"><summary>더보기</summary><div class="mobile-more-menu"><button onclick="q('#mobileActions').open=false;jumpToFieldPhotos()">사진 업로드·정리 <span id="fieldDock"></span></button><button onclick="q('#mobileActions').open=false;jumpToQuick()">간편 체크리스트</button><button onclick="q('#mobileActions').open=false;jumpToCycles()">점검주기·교체시기</button><button onclick="q('#mobileActions').open=false;showPhotoAlbum()">사진대장 보기</button><button onclick="q('#mobileActions').open=false;view('visits')">← 점검 목록</button><button onclick="q('#mobileActions').open=false;reload()">새로고침</button><button onclick="q('#mobileActions').open=false;shareB()">링크 공유</button><button onclick="q('#mobileActions').open=false;downloadPhotoBook('visit')">사진 ZIP 다운로드</button><button onclick="q('#mobileActions').open=false;report()">전체 보고서 / PDF</button></div></details></div></section>
 <section id="photoalbum" class="hidden"><div class="p album-back-wrap"><div class="album-actions noprint"><button class="ghost" onclick="backFromPhotoAlbum()">← 점검으로 돌아가기</button><button class="pri" onclick="downloadPhotoBook('visit')">사진 JPG/PNG ZIP 다운로드</button><button class="ghost" onclick="printPhotoAlbum()">PDF 저장 / 인쇄</button></div><p id="albumStatus" class="muted noprint"></p><div id="albumContent"></div><div class="album-back-fixed noprint"><button class="pri" onclick="backFromPhotoAlbum()">← 점검으로 돌아가기</button></div></div></section>
 <section id="report" class="hidden"><div class="p"><button class="ghost noprint" onclick="view('inspect')">← 점검으로</button><button class="pri noprint" onclick="print()" style="float:right">PDF 저장/인쇄</button><div id="rb"></div></div></section>
 </main><script>
@@ -762,6 +788,99 @@ function render(){
  }).join('');
  progress();
 }
+
+const PERIOD_ITEMS=gs.find(g=>g[0]==='3.2')[2],PERIOD_KEYS=new Set(PERIOD_ITEMS.map(x=>x[0]));
+function periodComplete(m){
+ return m?.action==='해당없음'||(m?.action==='점검'&&Number(m.cycle)>0)||
+ (m?.action==='교체'&&Number(m.replace_year)>0);
+}
+function periodInputs(k){
+ const el=x=>document.getElementById(x+'-'+k),a=el('pcAction'),c=el('pcMonths'),y=el('pcYear');
+ return a&&c&&y?{action:a.value,cycle:c.value,replace_year:y.value}:null;
+}
+function periodRowDirty(k){
+ const inp=periodInputs(k);if(!inp||!S.v)return false;
+ const prev=D(k).management||{};
+ return Object.entries(inp).some(([name,val])=>String(val)!==String(prev[name]??''));
+}
+function periodsDirty(){return PERIOD_ITEMS.some(([k])=>periodRowDirty(k));}
+function periodRow(k,name){
+ const m=D(k).management||{},ok=periodComplete(m);
+ return '<div id="pcRow-'+k+'" class="cycle-row'+(ok?' recorded':'')+'">'+
+ '<div class="cycle-head"><b>'+E(k+' '+name)+'</b><small>'+(ok?'✓ 작성됨':'○ 미작성')+'</small></div>'+
+ '<div class="cycle-fields"><label>관리 구분<select id="pcAction-'+k+'" data-pc="'+k+'" onchange="markPeriod(this.dataset.pc)">'+
+ ['','점검','교체','해당없음'].map(v=>'<option value="'+v+'"'+((m.action||'')===v?' selected':'')+'>'+E(v||'선택하세요')+'</option>').join('')+
+ '</select></label><label>점검주기 (개월)<input id="pcMonths-'+k+'" data-pc="'+k+'" type="number" inputmode="numeric" min="1" max="600" placeholder="개월" value="'+E(m.cycle??'')+'" oninput="markPeriod(this.dataset.pc)"></label>'+
+ '<label>교체시기 (년)<input id="pcYear-'+k+'" data-pc="'+k+'" type="number" inputmode="numeric" min="1" max="2100" placeholder="년" value="'+E(m.replace_year??'')+'" oninput="markPeriod(this.dataset.pc)"></label></div>'+
+ '<p class="cycle-unsaved">입력한 내용을 저장해 주세요.</p><div class="cycle-buttons">'+
+ '<button class="ghost" data-pc="'+k+'" onclick="goQuickDetail(this.dataset.pc)">상세 점검</button>'+
+ '<button class="pri" data-pc="'+k+'" onclick="savePeriod(this.dataset.pc)">주기 저장</button></div></div>';
+}
+function updatePeriodCount(){
+ const n=PERIOD_ITEMS.filter(([k])=>periodComplete(D(k).management)).length;
+ q('#cycleCount').textContent='작성 '+n+' / '+PERIOD_ITEMS.length;
+}
+function renderPeriods(){
+ if(!S.v||!q('#cycleRows'))return;
+ q('#cycleRows').innerHTML=PERIOD_ITEMS.map(([k,n])=>periodRow(k,n)).join('');
+ updatePeriodCount();
+}
+function refreshPeriod(k){
+ if(!PERIOD_KEYS.has(k))return;
+ const node=document.getElementById('pcRow-'+k),item=PERIOD_ITEMS.find(x=>x[0]===k);
+ if(node&&item)node.outerHTML=periodRow(k,item[1]);
+ updatePeriodCount();
+}
+function markPeriod(k){
+ document.getElementById('pcRow-'+k)?.classList.toggle('edited',periodRowDirty(k));
+}
+function jumpToCycles(){
+ const menu=q('#mobileActions');if(menu)menu.open=false;
+ q('#cycleChecklist').open=true;
+ q('#cyclePanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function itemDraft(k){
+ const d=D(k),m=d.management||{},fields=formFields(k);
+ const previous={nt:d.note||'',loc:m.location||'',oth:m.other||'',act:m.action||'',
+ cy:m.cycle??'',yr:m.replace_year??'',bs:m.basis||''};
+ return Object.entries(fields).some(([prefix,value])=>String(value)!==String(previous[prefix]));
+}
+async function savePeriod(k){
+ if(!S.v||!PERIOD_KEYS.has(k))return;
+ const values=periodInputs(k),item=D(k);
+ if(!values)return;
+ if(!values.action)return alert('관리 구분을 선택하세요.');
+ if(values.cycle&&(!/^\d+$/.test(values.cycle)||Number(values.cycle)<1||Number(values.cycle)>600))
+  return alert('점검주기는 1~600개월의 정수로 입력하세요.');
+ if(values.replace_year&&(!/^\d+$/.test(values.replace_year)||Number(values.replace_year)<1||Number(values.replace_year)>2100))
+  return alert('교체시기를 확인하세요.');
+ if(values.action==='점검'&&!values.cycle)return alert('점검주기(개월)를 입력하세요.');
+ if(values.action==='교체'&&!values.replace_year)return alert('교체시기(년)를 입력하세요.');
+ if(itemDraft(k))return alert('상세 점검에 저장되지 않은 입력이 있습니다. 상세 점검의 기록을 먼저 저장해 주세요.');
+ const visitId=S.v.visit.id;writing++;
+ try{
+  const management={...(item.management||{}),...values,cycle:values.cycle||null,replace_year:values.replace_year||null};
+  const j=await api('item',{method:'PUT',body:{visit_id:visitId,item_key:k,
+  result:item.result,note:item.note||'',management,expected_updated_at:item.updated_at||null}});
+  if(S.v?.visit.id!==visitId)return;
+  const index=S.v.items.findIndex(row=>row.item_key===k);
+  if(index>=0)S.v.items[index]=j.item;else S.v.items.push(j.item);
+  refreshCard(k,false);refreshPeriod(k);
+  q('#sync').textContent='주기·교체시기 저장 완료 · 상세 점검표와 연동됨';
+ }catch(error){
+  try{
+   const latest=await api('visit',{q:'&id='+encodeURIComponent(visitId)});
+   if(S.v?.visit.id===visitId){
+    S.v.items=S.v.items.filter(x=>x.item_key!==k);
+    const current=latest.items.find(x=>x.item_key===k);
+    if(current)S.v.items.push(current);
+    refreshCard(k,false);refreshPeriod(k);
+   }
+  }catch(ignore){}
+  alert(error.message);
+ }finally{writing--;}
+}
+
 function formFields(k){
  const keys=['nt','loc','oth','act','cy','yr','bs'],out={};
  keys.forEach(prefix=>{const field=q('#'+prefix+'-'+k);if(field)out[prefix]=field.value});
@@ -795,16 +914,17 @@ async function openV(id){
  history.replaceState(null,'',location.pathname+'?building='+encodeURIComponent(S.b.id)+'&visit='+encodeURIComponent(id));
  q('#vt').textContent=S.b.name+' · '+j.visit.inspection_on;
  q('#sharedAddress').textContent=S.b.address||'주소 미등록 · 점검 목록에서 주소를 등록해 주세요.';
- render();renderFieldPhotos();renderLocationShots();renderCareSchedules();
+ render();renderFieldPhotos();renderLocationShots();renderCareSchedules();renderPeriods();
  q('#fieldDetails').open=(j.photos||[]).some(p=>p.item_key==='inbox');
  view('inspect');
  q('#sync').textContent='공유 기록 · 15초 간격 자동 동기화';
 }
 async function reload(){
- if((hasDraft()||careHasDraft())&&!confirm('저장하지 않은 입력이 있습니다. 새로고침하면 사라집니다. 계속할까요?'))return;
+ if((hasDraft()||careHasDraft()||periodsDirty())&&!confirm('저장하지 않은 입력이 있습니다. 새로고침하면 사라집니다. 계속할까요?'))return;
  await openV(S.v.visit.id);
 }
 async function setS(k,v){
+ if(PERIOD_KEYS.has(k)&&periodRowDirty(k))return alert('주기 체크리스트의 입력을 먼저 저장해 주세요.');
  const d=D(k);d.result=v;
  if(!S.v.items.some(x=>x.item_key===k))S.v.items.push(d);
  await saveI(k);
@@ -815,6 +935,7 @@ function mg(k){
  cycle:q('#cy-'+k)?.value||null,replace_year:q('#yr-'+k)?.value||null,basis:q('#bs-'+k)?.value||''};
 }
 async function saveI(k){
+ if(PERIOD_KEYS.has(k)&&periodRowDirty(k))return alert('주기 체크리스트의 입력을 먼저 저장해 주세요.');
  const d=D(k),oldId=S.v.visit.id;
  writing++;
  try{
@@ -822,7 +943,7 @@ async function saveI(k){
   if(!S.v||S.v.visit.id!==oldId)return;
   const ix=S.v.items.findIndex(x=>x.item_key===k);
   if(ix>=0)S.v.items[ix]=j.item;else S.v.items.push(j.item);
-  refreshCard(k);
+  refreshCard(k);refreshPeriod(k);
   q('#sync').textContent='점검 기록 저장 완료 · 공용 기록에 반영';
  }catch(e){alert(e.message)}finally{writing--}
 }
@@ -843,7 +964,7 @@ function changedKeys(oldVisit,newVisit){
 }
 async function syncShared(){
  if(!S.v||q('#inspect').classList.contains('hidden')||writing)return;
- if(hasDraft()||careHasDraft()){
+ if(hasDraft()||careHasDraft()||periodsDirty()){
   q('#sync').textContent='저장되지 않은 입력이 있습니다. 기록 저장 후 자동 동기화됩니다.';
   return;
  }
@@ -858,7 +979,7 @@ async function syncShared(){
  const shotChanged=rowsUpdated(S.v.photo_checks,j.photo_checks,'check_key');
  const careChanged=rowsUpdated(S.v.care_schedules,j.care_schedules,'task_key');
  S.v=j;
- for(const k of keys)refreshCard(k,false);
+ for(const k of keys){refreshCard(k,false);refreshPeriod(k);}
  if(quickChanged||shotChanged)renderQuick();
  if(fieldChanged)renderFieldPhotos();
  if(quickChanged||shotChanged)renderLocationShots();
