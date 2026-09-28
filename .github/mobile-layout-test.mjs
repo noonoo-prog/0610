@@ -19,7 +19,7 @@ try {
   const mockPhotoId1 = '30000000-0000-4000-8000-000000000003';
   const mockPhotoId2 = '30000000-0000-4000-8000-000000000004';
   const photos = width === 390 ? [mockPhotoId1,mockPhotoId2].map((id,i)=>({id,item_key:'inbox',url:'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',caption:'',original_name:'현장'+(i+1)+'.jpg',created_at:'2026-09-28T03:00:0'+i+'Z'})) : [];
-  const shotChecks = [], careSchedules = [];
+  const shotChecks = [], quickChecks = [], careSchedules = [];
   await page.route('**/functions/v1/sangeo-inspection*', async route => {
    const op = new URL(route.request().url()).searchParams.get('op');
    if(op==='photo-check'){
@@ -28,6 +28,13 @@ try {
     const row={check_key:body.check_key,checked:body.checked,updated_at:'2026-09-28T04:00:00Z',updated_by:'직원'};
     shotChecks.push(row);
     return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({photo_check:row})});
+   }
+   if(op==='quick'){
+    const body=route.request().postDataJSON();
+    if(body.item_key!=='3.1.1'||typeof body.checked!=='boolean'||body.visit_id!==visitId)throw Error('Linked quick payload invalid');
+    const row={item_key:body.item_key,checked:body.checked,updated_at:'2026-09-28T04:01:00Z',updated_by:'공용 사용자'};
+    quickChecks.splice(0,quickChecks.length,row);
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({quick:row})});
    }
    if(op==='care-schedule'){
     const body=route.request().postDataJSON();
@@ -43,7 +50,7 @@ try {
     for(const photo of photos)if(changed.some(p=>p.id===photo.id))photo.item_key=body.item_key;
     return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({photos:changed})});
    }
-   const value=op==='visit'?{...mock.visit,photos,photo_checks:shotChecks,care_schedules:careSchedules}:mock[op]??{ok:true};
+   const value=op==='visit'?{...mock.visit,photos,quick:quickChecks,photo_checks:shotChecks,care_schedules:careSchedules}:mock[op]??{ok:true};
    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(value) });
   });
   await page.goto(origin + '?building=' + buildingId + '&visit=' + visitId, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -64,15 +71,26 @@ try {
   if (sizes.header > 88 || sizes.dock > 105) throw Error('Header or dock too tall: ' + JSON.stringify(sizes));
   if (sizes.textSize < 16 || sizes.buttonHeight < 44) throw Error('Form or rating target too small: ' + JSON.stringify(sizes));
   if (!sizes.dockVisible || sizes.groupCount !== 5 || sizes.openGroups !== 1 || sizes.menuCount !== 8) throw Error('Mobile navigation/groups missing: ' + JSON.stringify(sizes));
+  if (!(await page.locator('#who').textContent()).includes('공용 점검 계정')) throw Error('Unified account label missing');
+  if (await page.locator('#manageBtn').evaluate(el=>el.classList.contains('hidden'))) throw Error('Shared password settings not accessible');
   await page.locator('#mobileActions > summary').click();
   const menu = await page.locator('.mobile-more-menu').boundingBox();
   if (!menu || menu.x < -1 || menu.x + menu.width > width + 1) throw Error('More menu overflows viewport: ' + JSON.stringify(menu));
   await page.getByRole('button', { name: '촬영 체크', exact: true }).click();
   if ((await page.locator('.location-place').count()) !== 7) throw Error('Place groups missing');
-  if ((await page.locator('.location-check').count()) !== 30) throw Error('Photo shot list not complete');
+  if ((await page.locator('.location-check').count()) !== 32) throw Error('Photo shot list not complete');
   if (width === 390) {
    await page.locator('input[data-check-key="p_site_landscape"]').check();
-   await page.waitForFunction(() => document.getElementById('locPhotoTotal')?.textContent?.startsWith('1 / 30'));
+   await page.waitForFunction(() => document.getElementById('locPhotoTotal')?.textContent?.startsWith('1 / 32'));
+   await page.waitForFunction(() => [...document.querySelectorAll('.quick-photo-link')].some(el => el.dataset.quickKey === '3.1.1' && el.textContent.trim() === '촬영 1/1'));
+   await page.locator('[data-shot-row="p_site_landscape"] .linked-quick').click();
+   await page.waitForFunction(() => document.querySelector('[data-shot-row="p_site_landscape"] .linked-quick')?.getAttribute('aria-pressed') === 'true');
+   if (!(await page.locator('input[data-key="3.1.1"]').isChecked())) throw Error('Place check did not link to quick inspection');
+   if (!(await page.locator('[id="card-3.1.1"] .status-pill').textContent()).includes('미평가')) throw Error('Photo check incorrectly changed formal rating');
+   await page.locator('input[data-key="3.1.1"]').uncheck();
+   await page.waitForFunction(() => document.querySelector('[data-shot-row="p_site_landscape"] .linked-quick')?.getAttribute('aria-pressed') === 'false');
+   await page.locator('.quick-photo-link[data-quick-key="3.1.1"]').click();
+   if (!(await page.locator('[data-shot-row="p_site_landscape"]').isVisible())) throw Error('Quick inspection cannot navigate to linked photo');
   }
   await page.getByRole('button', { name: '청소 주기', exact: true }).click();
   if ((await page.locator('.care-task').count()) !== 15) throw Error('Building care list not complete');
