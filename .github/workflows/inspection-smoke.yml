@@ -34,6 +34,10 @@ jobs:
           grep -q 'photo-download' /tmp/sangeo-page
           grep -q 'id="fieldPhotos"' /tmp/sangeo-page
           grep -q 'photo-category' /tmp/sangeo-page
+          grep -q 'id="locationPhotos"' /tmp/sangeo-page
+          grep -q 'id="buildingCare"' /tmp/sangeo-page
+          grep -q "api('photo-check'" /tmp/sangeo-page
+          grep -q "api('care-schedule'" /tmp/sangeo-page
           echo "Staff website is published and served as HTML"
       - name: Check API readiness and login protection
         shell: bash
@@ -51,6 +55,11 @@ jobs:
           category_code="$(curl --max-time 20 -sS -o /tmp/blocked-category -w '%{http_code}' -X PATCH "$api?op=photo-category" -H 'Content-Type: application/json' -d '{}' )"
           test "$category_code" = "401"
           echo "Photo reassignment is restricted to authenticated staff"
+          shot_code="$(curl --max-time 20 -sS -o /tmp/blocked-shot -w '%{http_code}' -X PUT "$api?op=photo-check" -H 'Content-Type: application/json' -d '{}')"
+          care_code="$(curl --max-time 20 -sS -o /tmp/blocked-care -w '%{http_code}' -X PUT "$api?op=care-schedule" -H 'Content-Type: application/json' -d '{}')"
+          test "$shot_code" = "401"
+          test "$care_code" = "401"
+          echo "Photo check and care schedule remain available only to logged-in staff"
       - name: Check cross-site browser preflight
         shell: bash
         run: |
