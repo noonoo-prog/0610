@@ -291,7 +291,7 @@ button:focus-visible,.camera-action:focus-within,input:focus-visible,textarea:fo
 <section id="settings" class="p hidden"><button class="ghost" onclick="view('dash')">← 건물 목록</button><h1>공용 접속 비밀번호</h1><p class="muted">관리자·직원 구분 없이 같은 비밀번호를 사용합니다. 변경하려면 현재 비밀번호가 필요하며, 변경 후 다른 기기의 로그인은 만료됩니다.</p><div class="stack"><input id="currentPass" type="password" autocomplete="current-password" placeholder="현재 비밀번호"><input id="newPass" type="password" autocomplete="new-password" placeholder="새 비밀번호 (8자 이상)"><input id="newPassConfirm" type="password" autocomplete="new-password" placeholder="새 비밀번호 확인"><button class="pri" onclick="changePassword()">공용 비밀번호 변경</button></div></section><section id="setup" class="p hidden"><h1>최초 설정</h1><div class="stack"><input id="scode" placeholder="초기 설정 코드"><input id="sp" type="password" autocomplete="new-password" placeholder="공용 비밀번호 (8자 이상)"><button class="pri" onclick="setup()">설정 완료</button></div></section>
 <section id="login" class="p hidden"><h1>공용 접속</h1><p class="muted">공통 비밀번호 하나로 건물과 점검 기록을 이용합니다.</p><div class="stack"><input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()"><button class="pri" onclick="login()">접속</button></div></section>
 <section id="dash" class="hidden"><div class="p"><h1>공유 건축물</h1><p class="muted">같은 건물과 점검 기록을 공용으로 사용합니다. 주소로 검색하거나 선택하세요.</p><div id="who" class="muted"></div><label>건축물명 또는 주소 검색<input id="searchBuilding" type="search" placeholder="예: 퇴계로 264" oninput="renderBuildings()"></label><div style="height:9px"></div><button class="pri" onclick="q('#add').classList.toggle('hidden')">+ 건물 등록 / 주소 찾기</button><div id="add" class="stack hidden" style="margin-top:10px"><input id="bn" placeholder="건축물명"><input id="ba" placeholder="건축물 주소 (필수)"><div class="row"><input id="bu" placeholder="주용도"><input id="bd" type="date"></div><div class="muted">이미 등록된 주소라면 새 건물을 만들지 않고 기존 공유 건물로 이동합니다.</div><button class="pri" onclick="addB()">등록하고 공유 건물 열기</button></div></div><div id="bl"></div></section>
-<section id="visits" class="hidden"><div class="p"><button class="ghost" onclick="goDash()">← 건물 목록</button><h1 id="bt"></h1><div id="bm" class="muted"></div><div id="addressMissing" class="guide hidden" style="margin-top:9px">이 건물은 아직 주소가 없습니다. 아래 ‘주소 등록/수정’을 눌러 기존 점검 기록을 유지한 채 주소를 등록하세요.</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin:12px 0"><button class="pri" onclick="shareB()">🔗 건물 링크 공유</button><button class="ghost" onclick="editB()">주소 등록 / 수정</button></div><div id="editBuilding" class="stack hidden" style="margin-bottom:12px"><input id="ebn" placeholder="건축물명"><input id="eba" placeholder="건축물 주소 (필수)"><div class="row"><input id="ebu" placeholder="주용도"><input id="ebd" type="date"></div><button class="pri" onclick="saveB()">이 건물에 주소 저장</button></div><p class="muted">같은 건물·같은 날짜의 점검은 모두 하나의 공유 기록으로 들어갑니다.</p><div class="row"><input id="vd" type="date"><button class="pri" onclick="newV()">선택한 날짜의 공유 점검 열기</button></div></div><div id="vl"></div><div class="p"><button class="pri" onclick="downloadPhotoBook('building')">이 건물 사진 JPG/PNG ZIP 다운로드</button><p id="albumStatusBuilding" class="muted">사진을 점검항목명+순번으로 묶어 JPG/PNG 파일이 담긴 ZIP 한 개로 저장합니다.</p></div></section>
+<section id="visits" class="hidden"><div class="p"><button class="ghost" onclick="goDash()">← 건물 목록</button><h1 id="bt"></h1><div id="bm" class="muted"></div><div id="addressMissing" class="guide hidden" style="margin-top:9px">이 건물은 아직 주소가 없습니다. 아래 ‘주소 등록/수정’을 눌러 기존 점검 기록을 유지한 채 주소를 등록하세요.</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin:12px 0"><button class="pri" onclick="shareB()">🔗 건물 링크 공유</button><button class="ghost" onclick="editB()">주소 등록 / 수정</button></div><div id="editBuilding" class="stack hidden" style="margin-bottom:12px"><input id="ebn" placeholder="건축물명"><input id="eba" placeholder="건축물 주소 (필수)"><div class="row"><input id="ebu" placeholder="주용도"><input id="ebd" type="date"></div><button class="pri" onclick="saveB()">이 건물에 주소 저장</button></div><p class="muted">같은 건물·같은 날짜의 점검은 모두 하나의 공유 기록으로 들어갑니다.</p><div class="row"><input id="vd" type="date"><button class="pri" onclick="newV()">선택한 날짜의 공유 점검 열기</button></div></div><div id="vl"></div><details class="p visit-trash" id="visitTrash"><summary>휴지통 <span id="trashCount">0건</span></summary><p class="muted">삭제한 점검일은 이곳에 보관됩니다. 점검·체크·사진 기록을 그대로 복원할 수 있습니다.</p><div id="trashList"></div></details><div class="p"><button class="pri" onclick="downloadPhotoBook('building')">이 건물 사진 JPG/PNG ZIP 다운로드</button><p id="albumStatusBuilding" class="muted">사진을 점검항목명+순번으로 묶어 JPG/PNG 파일이 담긴 ZIP 한 개로 저장합니다.</p></div></section>
 <section id="inspect" class="hidden"><div class="p noprint"><div class="inspect-heading"><button class="ghost" onclick="view('visits')">← 점검 목록</button><details class="inspect-options noprint"><summary>⋯ 메뉴</summary><div class="inspect-options-menu"><button onclick="q('.inspect-options').open=false;reload()">새로고침</button><button onclick="q('.inspect-options').open=false;shareB()">건물 링크 공유</button></div></details></div><h1 id="vt"></h1><div class="muted" id="sharedAddress"></div><div class="bar" style="margin-top:9px"><i id="bar"></i></div><div id="prog" class="muted"></div><div id="sync" class="muted">공용 점검 기록 · 15초 간격 자동 동기화</div></div><nav id="inspectTabs" class="workspace-tabs noprint" aria-label="점검 메뉴"><button id="wsTab-onsite" class="ws-tab active" data-ws-tab="onsite" onclick="setWorkspaceTab('onsite')"><span>01</span> 현장 체크</button><button id="wsTab-care" class="ws-tab" data-ws-tab="care" onclick="setWorkspaceTab('care')"><span>02</span> 관리 일정</button><button id="wsTab-photos" class="ws-tab" data-ws-tab="photos" onclick="setWorkspaceTab('photos')"><span>03</span> 사진함</button><button id="wsTab-evaluation" class="ws-tab" data-ws-tab="evaluation" onclick="setWorkspaceTab('evaluation')"><span>04</span> 정식 점검</button></nav><div class="workspace-pane" id="wsPane-onsite"><div class="p noprint location-photos" id="locationPhotos">
 <div class="check-title"><h2>장소별 촬영</h2><strong id="locPhotoTotal" role="status" aria-live="polite">0 / 32</strong></div>
 <p class="muted">휴대전화로 촬영한 항목만 체크하세요. 현장 확인 여부는 따로 기록됩니다.</p>
@@ -414,10 +414,54 @@ async function shareB(){
  catch(e){prompt('공유할 건물 링크를 복사하세요',url)}
 }
 async function loadV(){
- const j=await api('visits',{q:'&building_id='+S.b.id});S.vs=j.visits;
- q('#vl').innerHTML=j.visits.length?j.visits.map(v=>
- '<div class="p" onclick="openV(\''+v.id+'\')"><h3>'+E(v.inspection_on)+' 공동 점검</h3><div class="muted">최초 점검자 '+E(v.inspector||'-')+' · 공용 기록</div></div>').join(''):'<div class="p muted">아직 점검 기록이 없습니다. 날짜를 선택해 시작하세요.</div>'
+ if(!S.b)return;
+ const bid=S.b.id;
+ const [a,d]=await Promise.all([
+  api('visits',{q:'&building_id='+encodeURIComponent(bid)}),
+  api('visits',{q:'&building_id='+encodeURIComponent(bid)+'&trashed=1'})
+ ]);
+ if(!S.b||S.b.id!==bid)return;
+ S.vs=a.visits;S.trashedVisits=d.visits;
+ q('#vl').innerHTML=S.vs.length?S.vs.map(v=>
+  '<div class="p visit-card"><button class="visit-open" data-visit-id="'+E(v.id)+'" onclick="openV(this.dataset.visitId)">'+
+  '<strong>'+E(v.inspection_on)+' 공동 점검</strong><span>점검 기록 열기</span></button>'+
+  '<button class="visit-trash-button" data-visit-id="'+E(v.id)+'" onclick="moveVisitToTrash(this.dataset.visitId)">삭제</button></div>'
+ ).join(''):'<div class="p muted">현재 점검 기록이 없습니다. 휴지통에서 복원하거나 새 점검을 열 수 있습니다.</div>';
+ q('#trashCount').textContent=S.trashedVisits.length+'건';
+ q('#trashList').innerHTML=S.trashedVisits.length?S.trashedVisits.map(v=>
+  '<div class="trashed-entry"><div><b>'+E(v.inspection_on)+' 공동 점검</b><small>휴지통 이동 · '+E(v.deleted_at?.slice(0,10)||'')+'</small></div>'+
+  '<button data-visit-id="'+E(v.id)+'" onclick="restoreTrashedVisit(this.dataset.visitId)">복원</button></div>'
+ ).join(''):'<p class="muted">휴지통이 비어 있습니다.</p>';
 }
+async function moveVisitToTrash(id){
+ if(!S.b)return;
+ const entry=(S.vs||[]).find(v=>v.id===id);
+ if(!entry)return alert('점검 목록을 새로고침해 주세요.');
+ const date=entry.inspection_on;
+ const answer=prompt(date+' 공동 점검을 휴지통으로 이동합니다.\n날짜를 정확히 입력하면 이동합니다.\n\n점검일 입력:','');
+ if(answer===null)return;
+ if(answer.trim()!==date)return alert('날짜가 일치하지 않아 삭제하지 않았습니다.');
+ try{
+  await api('visit-trash',{method:'PATCH',body:{visit_id:id,building_id:S.b.id,inspection_on:date,action:'trash'}});
+  if(S.v?.visit.id===id)S.v=null;
+  history.replaceState(null,'',location.pathname+'?building='+encodeURIComponent(S.b.id));
+  await loadV();
+  q('#visitTrash').open=true;
+  alert(date+' 점검을 휴지통으로 옮겼습니다. 사진과 점검 내용은 보존됩니다.');
+ }catch(e){alert(e.message)}
+}
+async function restoreTrashedVisit(id){
+ if(!S.b)return;
+ const entry=(S.trashedVisits||[]).find(v=>v.id===id);
+ if(!entry)return alert('휴지통 목록을 새로고침해 주세요.');
+ if(!confirm(entry.inspection_on+' 공동 점검을 복원할까요?'))return;
+ try{
+  await api('visit-trash',{method:'PATCH',body:{visit_id:id,building_id:S.b.id,inspection_on:entry.inspection_on,action:'restore'}});
+  await loadV();
+  alert(entry.inspection_on+' 점검 기록을 복원했습니다.');
+ }catch(e){alert(e.message)}
+}
+
 async function newV(){
  try{
   const j=await api('visits',{method:'POST',body:{building_id:S.b.id,inspection_on:q('#vd').value}});
