@@ -88,15 +88,141 @@ async function newV(){
 }
 function D(k){return(S.v.items||[]).find(x=>x.item_key===k)||{item_key:k,result:null,note:'',management:{}}}function P(k){return(S.v.photos||[]).filter(x=>x.item_key===k)}
 function mUI(k,d){if(!k.startsWith('3.2.'))return'';let m=d.management||{},loc=['3.2.3','3.2.4','3.2.5'].includes(k)?'<label>설비 위치<select id="loc-'+k+'"><option></option><option'+(m.location==='지하'?' selected':'')+'>지하</option><option'+(m.location==='옥상'?' selected':'')+'>옥상</option><option'+(m.location==='기타'?' selected':'')+'>기타</option></select></label><input id="oth-'+k+'" placeholder="기타 위치" value="'+E(m.other||'')+'">':'';return'<div class="p" style="background:#fafafa"><b>점검주기·교체시기</b><div class="row">'+loc+'<label>실시여부<select id="act-'+k+'"><option></option><option'+(m.action==='점검'?' selected':'')+'>점검</option><option'+(m.action==='교체'?' selected':'')+'>교체</option><option'+(m.action==='해당없음'?' selected':'')+'>해당없음</option></select></label><label>점검주기(개월)<input id="cy-'+k+'" type="number" value="'+E(m.cycle??'')+'"></label><label>교체시기(년)<input id="yr-'+k+'" type="number" value="'+E(m.replace_year??'')+'"></label><label>근거/기록<input id="bs-'+k+'" value="'+E(m.basis||'')+'" placeholder="관리대장·점검표 등"></label></div><div class="muted">'+(k==='3.2.1'?'저수조 정기청소·위생점검 주기도 비고에 기록':k==='3.2.5'?'환기: 필터 교체 2회/년, 덕트 청소 1회/년 확인':'실제 관리기록 기준으로 입력')+'</div></div>'}
-function card(k,n){let d=D(k),ps=P(k),g=G[k]||gen;return'<div class="c"><div class="hd"><h3>'+k+' '+E(n)+'</h3><div class="muted">사진 '+ps.length+'장 · '+E(d.result||'미평가')+'</div></div><div class="bd"><div class="guide"><b>현장 사진 체크리스트</b><ul>'+g.map(x=>'<li>'+E(x)+'</li>').join('')+'</ul></div><div class="st">'+['양호','보통','미흡','불량','해당없음','점검불가'].map(x=>'<button class="'+(d.result===x?'on':'')+'" onclick="setS(\''+k+'\',\''+x+'\')">'+x+'</button>').join('')+'</div>'+mUI(k,d)+'<textarea id="nt-'+k+'" placeholder="점검현황·수치·사유·개선의견">'+E(d.note||'')+'</textarea><div style="margin-top:7px"><button class="pri" onclick="saveI(\''+k+'\')">기록 저장</button> <label class="ghost" style="display:inline-block;padding:10px;border-radius:9px;font-weight:700">📷 사진 촬영<input type="file" accept="image/*" capture="environment" style="display:none" onchange="up(\''+k+'\',this)"></label></div><div class="thumbs">'+ps.map(p=>'<div class="thumb"><img src="'+E(p.url)+'"><button onclick="delP(\''+p.id+'\')">×</button></div>').join('')+'</div></div></div>'}
-function render(){let t=0,d=0,h='';gs.forEach(g=>{h+='<h2>'+g[0]+' '+g[1]+'</h2>';g[2].forEach(x=>{t++;if(D(x[0]).result)d++;h+=card(x[0],x[1])})});q('#items').innerHTML=h;q('#bar').style.width=(d/t*100)+'%';q('#prog').textContent='완료 '+d+' / '+t+' 항목'}
-async function openV(id){S.v=await api('visit',{q:'&id='+id});S.b=S.v.building;q('#vt').textContent=S.b.name+' · '+S.v.visit.inspection_on;render();view('inspect')}async function reload(){await openV(S.v.visit.id)}
-async function setS(k,v){let d=D(k);d.result=v;if(!S.v.items.some(x=>x.item_key===k))S.v.items.push(d);await saveI(k)}
-function mg(k){if(!k.startsWith('3.2.'))return{};return{location:q('#loc-'+k)?.value||'',other:q('#oth-'+k)?.value||'',action:q('#act-'+k)?.value||'',cycle:q('#cy-'+k)?.value||null,replace_year:q('#yr-'+k)?.value||null,basis:q('#bs-'+k)?.value||''}}
-async function saveI(k){try{let d=D(k),j=await api('item',{method:'PUT',body:{visit_id:S.v.visit.id,item_key:k,result:d.result,note:q('#nt-'+k).value,management:mg(k)}}),i=S.v.items.findIndex(x=>x.item_key===k);i>=0?S.v.items[i]=j.item:S.v.items.push(j.item);render()}catch(e){alert(e.message)}}
+function card(k,n){let d=D(k),ps=P(k),g=G[k]||gen;return'<div class="c" id="card-'+k+'"><div class="hd"><h3>'+k+' '+E(n)+'</h3><div class="muted">사진 '+ps.length+'장 · '+E(d.result||'미평가')+' · '+E(d.updated_by||'미작성')+'</div></div><div class="bd"><div class="guide"><b>현장 사진 체크리스트</b><ul>'+g.map(x=>'<li>'+E(x)+'</li>').join('')+'</ul></div><div class="st">'+['양호','보통','미흡','불량','해당없음','점검불가'].map(x=>'<button class="'+(d.result===x?'on':'')+'" onclick="setS(\''+k+'\',\''+x+'\')">'+x+'</button>').join('')+'</div>'+mUI(k,d)+'<textarea id="nt-'+k+'" placeholder="점검현황·수치·사유·개선의견">'+E(d.note||'')+'</textarea><div style="margin-top:7px"><button class="pri" onclick="saveI(\''+k+'\')">기록 저장</button> <label class="ghost" style="display:inline-block;padding:10px;border-radius:9px;font-weight:700">📷 사진 촬영<input type="file" accept="image/*" capture="environment" style="display:none" onchange="up(\''+k+'\',this)"></label></div><div class="thumbs">'+ps.map(p=>'<div class="thumb"><img src="'+E(p.url)+'"><button onclick="delP(\''+p.id+'\')">×</button></div>').join('')+'</div></div></div>'}
+let writing=0,syncTimer=null;
+function progress(){
+ const all=gs.flatMap(g=>g[2]),done=all.filter(x=>D(x[0]).result).length;
+ q('#bar').style.width=(done/all.length*100)+'%';
+ q('#prog').textContent='평가 완료 '+done+' / '+all.length+' 항목';
+}
+function render(){
+ q('#items').innerHTML=gs.map(g=>'<h2>'+g[0]+' '+g[1]+'</h2>'+g[2].map(x=>card(x[0],x[1])).join('')).join('');
+ progress();
+}
+function formFields(k){
+ const keys=['nt','loc','oth','act','cy','yr','bs'],out={};
+ keys.forEach(prefix=>{const field=q('#'+prefix+'-'+k);if(field)out[prefix]=field.value});
+ return out;
+}
+function restoreFields(k,fields){
+ for(const [prefix,value] of Object.entries(fields)){const el=q('#'+prefix+'-'+k);if(el)el.value=value}
+}
+function refreshCard(k){
+ const node=document.getElementById('card-'+k);
+ if(!node)return;
+ const name=gs.flatMap(g=>g[2]).find(x=>x[0]===k)?.[1]||k;
+ const drafts=formFields(k);
+ node.outerHTML=card(k,name);
+ restoreFields(k,drafts);
+ progress();
+}
+function hasDraft(){
+ if(!S.v)return false;
+ return gs.some(g=>g[2].some(([k])=>{
+  const d=D(k),m=d.management||{},current=formFields(k);
+  const base={nt:d.note||'',loc:m.location||'',oth:m.other||'',act:m.action||'',cy:m.cycle??'',yr:m.replace_year??'',bs:m.basis||''};
+  return Object.entries(current).some(([f,v])=>String(v)!==String(base[f]));
+ }));
+}
+async function openV(id){
+ const j=await api('visit',{q:'&id='+id});
+ S.v=j;S.b=j.building;
+ history.replaceState(null,'',location.pathname+'?building='+encodeURIComponent(S.b.id)+'&visit='+encodeURIComponent(id));
+ q('#vt').textContent=S.b.name+' · '+j.visit.inspection_on;
+ q('#sharedAddress').textContent=S.b.address||'주소 미등록 · 점검 목록에서 주소를 등록해 주세요.';
+ render();view('inspect');
+ q('#sync').textContent='공유 기록 · 15초 간격 자동 동기화';
+}
+async function reload(){
+ if(hasDraft()&&!confirm('저장하지 않은 입력이 있습니다. 새로고침하면 사라집니다. 계속할까요?'))return;
+ await openV(S.v.visit.id);
+}
+async function setS(k,v){
+ const d=D(k);d.result=v;
+ if(!S.v.items.some(x=>x.item_key===k))S.v.items.push(d);
+ await saveI(k);
+}
+function mg(k){
+ if(!k.startsWith('3.2.'))return {};
+ return {location:q('#loc-'+k)?.value||'',other:q('#oth-'+k)?.value||'',action:q('#act-'+k)?.value||'',
+ cycle:q('#cy-'+k)?.value||null,replace_year:q('#yr-'+k)?.value||null,basis:q('#bs-'+k)?.value||''};
+}
+async function saveI(k){
+ const d=D(k),oldId=S.v.visit.id;
+ writing++;
+ try{
+  const j=await api('item',{method:'PUT',body:{visit_id:oldId,item_key:k,result:d.result,note:q('#nt-'+k).value,management:mg(k)}});
+  if(!S.v||S.v.visit.id!==oldId)return;
+  const ix=S.v.items.findIndex(x=>x.item_key===k);
+  if(ix>=0)S.v.items[ix]=j.item;else S.v.items.push(j.item);
+  refreshCard(k);
+  q('#sync').textContent='기록 저장 완료 · 직원 간 공유 중';
+ }catch(e){alert(e.message)}finally{writing--}
+}
+function changedKeys(oldVisit,newVisit){
+ const changed=new Set();
+ const oi=new Map((oldVisit.items||[]).map(x=>[x.item_key,x]));
+ const ni=new Map((newVisit.items||[]).map(x=>[x.item_key,x]));
+ for(const k of new Set([...oi.keys(),...ni.keys()])){
+  const a=oi.get(k),b=ni.get(k);
+  if((a?.updated_at||'')!==(b?.updated_at||'')||(a?.result||'')!==(b?.result||''))changed.add(k);
+ }
+ const op=new Map((oldVisit.photos||[]).map(x=>[x.id,x.item_key]));
+ const np=new Map((newVisit.photos||[]).map(x=>[x.id,x.item_key]));
+ for(const id of new Set([...op.keys(),...np.keys()])){
+  if(!op.has(id)||!np.has(id))changed.add(op.get(id)||np.get(id));
+ }
+ return [...changed].filter(Boolean);
+}
+async function syncShared(){
+ if(!S.v||q('#inspect').classList.contains('hidden')||writing)return;
+ if(hasDraft()){
+  q('#sync').textContent='저장되지 않은 입력이 있습니다. 기록 저장 후 자동 동기화됩니다.';
+  return;
+ }
+ const active=document.activeElement;
+ if(active&&active.closest('#items')&&active.matches('input,textarea,select'))return;
+ const id=S.v.visit.id;
+ const j=await api('visit',{q:'&id='+id});
+ if(!S.v||S.v.visit.id!==id)return;
+ const keys=changedKeys(S.v,j);
+ S.v=j;
+ for(const k of keys)refreshCard(k);
+ q('#sync').textContent='공유 동기화 완료 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+}
+function startSync(){
+ if(syncTimer)return;
+ syncTimer=setInterval(async()=>{
+  if(document.hidden||!S.token||writing)return;
+  try{
+   if(!q('#inspect').classList.contains('hidden'))await syncShared();
+   else if(!q('#visits').classList.contains('hidden')&&S.b)await loadV();
+   else if(!q('#dash').classList.contains('hidden'))await loadB();
+  }catch(e){if(!q('#inspect').classList.contains('hidden'))q('#sync').textContent='동기화 실패 · 공유 기록 새로고침을 눌러주세요.'}
+ },15000);
+}
 async function img(f){let im=await createImageBitmap(f),s=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);let b=await new Promise(r=>c.toBlob(r,'image/jpeg',.75)),u=new Uint8Array(await b.arrayBuffer()),x='';for(let i=0;i<u.length;i+=8192)x+=String.fromCharCode(...u.subarray(i,i+8192));return{base64:btoa(x),mime:'image/jpeg'}}
-async function up(k,i){if(!i.files[0])return;try{let x=await img(i.files[0]);await api('photo',{method:'POST',body:{visit_id:S.v.visit.id,item_key:k,filename:i.files[0].name,...x}});await reload()}catch(e){alert(e.message)}finally{i.value=''}}
-async function delP(id){if(!confirm('사진 삭제?'))return;await api('photo',{method:'DELETE',q:'&id='+id});await reload()}
+async function up(k,i){
+ const f=i.files[0];if(!f)return;
+ writing++;
+ try{
+  const x=await img(f);
+  const j=await api('photo',{method:'POST',body:{visit_id:S.v.visit.id,item_key:k,filename:f.name,...x}});
+  S.v.photos.push(j.photo);
+  refreshCard(k);
+  q('#sync').textContent='사진을 공유 기록에 저장했습니다.';
+ }catch(e){alert(e.message)}finally{i.value='';writing--}
+}
+async function delP(id){
+ if(!confirm('사진을 삭제할까요? 다른 직원의 화면에서도 사라집니다.'))return;
+ writing++;
+ try{
+  const p=S.v.photos.find(x=>x.id===id);
+  await api('photo',{method:'DELETE',q:'&id='+id});
+  S.v.photos=S.v.photos.filter(x=>x.id!==id);
+  if(p)refreshCard(p.item_key);
+ }catch(e){alert(e.message)}finally{writing--}
+}
 function report(){let b=S.v.building||S.b,v=S.v.visit,h='<h1>건축물 정기점검 현장 보고서</h1><p><b>'+E(b.name)+'</b><br>'+E(b.address||'')+'<br>점검일 '+E(v.inspection_on)+' · 점검자 '+E(v.inspector||'')+'</p>';gs.forEach(g=>{h+='<h2>'+g[0]+' '+g[1]+'</h2>';g[2].forEach(x=>{let d=D(x[0]),ps=P(x[0]);h+='<div class="report"><h3>'+x[0]+' '+E(x[1])+' — '+E(d.result||'미평가')+'</h3>'+((d.management&&Object.values(d.management).some(Boolean))?'<p class="muted">위치: '+E(d.management.location||'-')+(d.management.other?'('+E(d.management.other)+')':'')+' · 관리: '+E(d.management.action||'-')+' · 점검주기: '+E(d.management.cycle??'-')+'개월 · 교체시기: '+E(d.management.replace_year??'-')+'년 · 근거: '+E(d.management.basis||'-')+'</p>':'')+'<p>'+E(d.note||'').replace(/\n/g,'<br>')+'</p><div class="rphotos">'+ps.map(p=>'<img src="'+E(p.url)+'">').join('')+'</div></div>'})});q('#rb').innerHTML=h;view('report')}
 boot();
 </script></body></html>
