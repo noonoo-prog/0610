@@ -107,13 +107,13 @@ function formFields(k){
 function restoreFields(k,fields){
  for(const [prefix,value] of Object.entries(fields)){const el=q('#'+prefix+'-'+k);if(el)el.value=value}
 }
-function refreshCard(k){
+function refreshCard(k,preserveDraft=true){
  const node=document.getElementById('card-'+k);
  if(!node)return;
  const name=gs.flatMap(g=>g[2]).find(x=>x[0]===k)?.[1]||k;
- const drafts=formFields(k);
+ const drafts=preserveDraft?formFields(k):null;
  node.outerHTML=card(k,name);
- restoreFields(k,drafts);
+ if(drafts)restoreFields(k,drafts);
  progress();
 }
 function hasDraft(){
@@ -151,7 +151,7 @@ async function saveI(k){
  const d=D(k),oldId=S.v.visit.id;
  writing++;
  try{
-  const j=await api('item',{method:'PUT',body:{visit_id:oldId,item_key:k,result:d.result,note:q('#nt-'+k).value,management:mg(k)}});
+  const j=await api('item',{method:'PUT',body:{visit_id:oldId,item_key:k,result:d.result,note:q('#nt-'+k).value,management:mg(k),expected_updated_at:d.updated_at||null}});
   if(!S.v||S.v.visit.id!==oldId)return;
   const ix=S.v.items.findIndex(x=>x.item_key===k);
   if(ix>=0)S.v.items[ix]=j.item;else S.v.items.push(j.item);
@@ -187,7 +187,7 @@ async function syncShared(){
  if(!S.v||S.v.visit.id!==id)return;
  const keys=changedKeys(S.v,j);
  S.v=j;
- for(const k of keys)refreshCard(k);
+ for(const k of keys)refreshCard(k,false);
  q('#sync').textContent='공유 동기화 완료 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
 }
 function startSync(){
