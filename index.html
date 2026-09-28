@@ -517,7 +517,7 @@ function renderFieldPhotos(){
  const unfiled=photos.filter(p=>p.item_key==="inbox").length;
  q('#fieldCount').textContent='미분류 '+unfiled+'장';
  q('#fieldTotal').textContent='전체 '+photos.length+'장';
- q('#fieldDock').textContent=unfiled?'('+unfiled+')':'';
+ const oldDockCounter=q('#fieldDock');if(oldDockCounter)oldDockCounter.textContent=unfiled?'('+unfiled+')':'';
  if(!q('#fieldTarget').innerHTML)q('#fieldTarget').innerHTML=fieldOptions();
  const visible=visibleFieldPhotos();
  q('#fieldGrid').innerHTML=visible.length?visible.map(p=>
