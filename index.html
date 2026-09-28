@@ -255,6 +255,38 @@ button:focus-visible,.camera-action:focus-within,input:focus-visible,textarea:fo
 @media(max-width:350px){.cycle-fields{gap:5px}.cycle-head b{font-size:14px}}
 @media print{.cycle-panel{display:none!important}}
 .cycle-detail-head{display:flex;gap:9px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:10px}.cycle-detail-head button{min-height:40px;padding:8px 10px;font-size:13px}
+
+/* Four task-oriented screens instead of one long inspection page. */
+.workspace-tabs{position:sticky;top:68px;z-index:2;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;padding:7px;background:#fff;border:1px solid #dee7ec;border-radius:12px;margin:0 0 12px;box-shadow:0 3px 15px #12304713}
+.workspace-tabs button{min-width:0;min-height:50px;padding:10px 4px;font-size:15px;font-weight:800;border-radius:9px;background:transparent;color:#43566a}
+.workspace-tabs button span{color:#7b90a2;font-size:11px;margin-right:3px}
+.workspace-tabs button.active,.workspace-bottom button.active{background:#007eaa;color:#fff;box-shadow:0 3px 10px #007eaa2c}
+.workspace-tabs button.active span{color:#d7f6ff}
+.workspace-pane{min-width:0}
+.workspace-pane>.p{margin-bottom:10px}
+.inspect-heading{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.inspect-options{position:relative}
+.inspect-options>summary{list-style:none;cursor:pointer;display:flex;align-items:center;min-height:43px;background:#ecf2f5;color:#30465a;border-radius:9px;padding:8px 12px;font-size:13px;font-weight:750}
+.inspect-options>summary::-webkit-details-marker{display:none}
+.inspect-options-menu{position:absolute;top:calc(100% + 7px);right:0;z-index:8;width:min(240px,calc(100vw - 30px));box-sizing:border-box;padding:8px;display:grid;gap:6px;border-radius:10px;background:white;border:1px solid #dce5eb;box-shadow:0 9px 25px #102b3e29}
+.inspect-options-menu button{font-size:14px;text-align:left;background:#edf3f6;color:#30475a;min-height:46px}
+.workspace-heading h2,.photo-exports h2{font-size:19px;margin:0 0 7px}
+.workspace-heading p,.photo-exports p{margin:0 0 12px}
+.workspace-heading button{min-height:46px}
+.photo-export-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.photo-export-buttons button{min-height:49px}
+.workspace-bottom{display:none}
+@media(max-width:680px){
+ .workspace-tabs{display:none}
+ .workspace-bottom{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;position:fixed;bottom:0;left:0;right:0;z-index:8;padding:9px max(10px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));background:#fff;border-top:1px solid #dce5eb;box-shadow:0 -4px 20px #142e431a}
+ .workspace-bottom button{min-width:0;min-height:50px;font-size:15px;font-weight:800;border-radius:10px;padding:8px 3px;background:#eaf1f5;color:#344b5b}
+ .workspace-pane{padding-top:4px}
+ .workspace-heading h2,.photo-exports h2{font-size:18px}
+ .inspect-options>summary{min-height:44px}
+}
+@media(max-width:350px){.workspace-bottom button{font-size:14px}}
+@media print{.workspace-tabs,.workspace-bottom,.inspect-options{display:none!important}}
+
 </style></head><body><header><div class="header-brand"><strong>SANGEO <span>ARCHITECTURE</span></strong><small>건축물 정기점검 · 공용 접속</small></div><div class="header-tools noprint"><button id="manageBtn" class="ghost hidden" onclick="view('settings')">설정</button><button id="logoutBtn" class="ghost hidden" onclick="logout()">로그아웃</button></div></header><main>
 <section id="settings" class="p hidden"><button class="ghost" onclick="view('dash')">← 건물 목록</button><h1>공용 접속 비밀번호</h1><p class="muted">관리자·직원 구분 없이 같은 비밀번호를 사용합니다. 변경하려면 현재 비밀번호가 필요하며, 변경 후 다른 기기의 로그인은 만료됩니다.</p><div class="stack"><input id="currentPass" type="password" autocomplete="current-password" placeholder="현재 비밀번호"><input id="newPass" type="password" autocomplete="new-password" placeholder="새 비밀번호 (8자 이상)"><input id="newPassConfirm" type="password" autocomplete="new-password" placeholder="새 비밀번호 확인"><button class="pri" onclick="changePassword()">공용 비밀번호 변경</button></div></section><section id="setup" class="p hidden"><h1>최초 설정</h1><div class="stack"><input id="scode" placeholder="초기 설정 코드"><input id="sp" type="password" autocomplete="new-password" placeholder="공용 비밀번호 (8자 이상)"><button class="pri" onclick="setup()">설정 완료</button></div></section>
 <section id="login" class="p hidden"><h1>공용 접속</h1><p class="muted">공통 비밀번호 하나로 건물과 점검 기록을 이용합니다.</p><div class="stack"><input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()"><button class="pri" onclick="login()">접속</button></div></section>
