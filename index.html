@@ -709,7 +709,8 @@ async function showPhotoAlbum(){
   if(!doc.photos.length)return alert('저장된 사진이 없습니다. 현장에서 사진을 먼저 올려주세요.');
   const page=albumMarkup([doc],p=>p.url);
   q('#albumContent').innerHTML=page.html;
-  albumMessage('총 '+page.count+'장 · 항목 제목과 사진 제목을 함께 표시합니다.');
+  const unsorted=doc.photos.filter(p=>p.item_key==='inbox').length;
+  albumMessage('총 '+page.count+'장'+(unsorted?' · 미분류 '+unsorted+'장 (현장 사진함에서 항목 지정 가능)':' · 모두 분류됨')+' · 항목 제목과 사진 제목을 표시합니다.');
   inspectScrollBeforeAlbum=window.scrollY;
   view('photoalbum');
   window.scrollTo(0,0);
