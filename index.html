@@ -260,24 +260,29 @@ button:focus-visible,.camera-action:focus-within,input:focus-visible,textarea:fo
 <section id="login" class="p hidden"><h1>공용 접속</h1><p class="muted">공통 비밀번호 하나로 건물과 점검 기록을 이용합니다.</p><div class="stack"><input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()"><button class="pri" onclick="login()">접속</button></div></section>
 <section id="dash" class="hidden"><div class="p"><h1>공유 건축물</h1><p class="muted">같은 건물과 점검 기록을 공용으로 사용합니다. 주소로 검색하거나 선택하세요.</p><div id="who" class="muted"></div><label>건축물명 또는 주소 검색<input id="searchBuilding" type="search" placeholder="예: 퇴계로 264" oninput="renderBuildings()"></label><div style="height:9px"></div><button class="pri" onclick="q('#add').classList.toggle('hidden')">+ 건물 등록 / 주소 찾기</button><div id="add" class="stack hidden" style="margin-top:10px"><input id="bn" placeholder="건축물명"><input id="ba" placeholder="건축물 주소 (필수)"><div class="row"><input id="bu" placeholder="주용도"><input id="bd" type="date"></div><div class="muted">이미 등록된 주소라면 새 건물을 만들지 않고 기존 공유 건물로 이동합니다.</div><button class="pri" onclick="addB()">등록하고 공유 건물 열기</button></div></div><div id="bl"></div></section>
 <section id="visits" class="hidden"><div class="p"><button class="ghost" onclick="goDash()">← 건물 목록</button><h1 id="bt"></h1><div id="bm" class="muted"></div><div id="addressMissing" class="guide hidden" style="margin-top:9px">이 건물은 아직 주소가 없습니다. 아래 ‘주소 등록/수정’을 눌러 기존 점검 기록을 유지한 채 주소를 등록하세요.</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin:12px 0"><button class="pri" onclick="shareB()">🔗 건물 링크 공유</button><button class="ghost" onclick="editB()">주소 등록 / 수정</button></div><div id="editBuilding" class="stack hidden" style="margin-bottom:12px"><input id="ebn" placeholder="건축물명"><input id="eba" placeholder="건축물 주소 (필수)"><div class="row"><input id="ebu" placeholder="주용도"><input id="ebd" type="date"></div><button class="pri" onclick="saveB()">이 건물에 주소 저장</button></div><p class="muted">같은 건물·같은 날짜의 점검은 모두 하나의 공유 기록으로 들어갑니다.</p><div class="row"><input id="vd" type="date"><button class="pri" onclick="newV()">선택한 날짜의 공유 점검 열기</button></div></div><div id="vl"></div><div class="p"><button class="pri" onclick="downloadPhotoBook('building')">이 건물 사진 JPG/PNG ZIP 다운로드</button><p id="albumStatusBuilding" class="muted">사진을 점검항목명+순번으로 묶어 JPG/PNG 파일이 담긴 ZIP 한 개로 저장합니다.</p></div></section>
-<section id="inspect" class="hidden"><div class="p noprint"><button class="ghost" onclick="view('visits')">← 점검 목록</button><h1 id="vt"></h1><div class="muted" id="sharedAddress"></div><div class="bar" style="margin-top:9px"><i id="bar"></i></div><div id="prog" class="muted"></div><div id="sync" class="muted">공용 점검 기록 · 15초 간격 자동 동기화</div></div><div class="p noprint location-photos" id="locationPhotos">
-<div class="check-title"><h2>장소별 사진 촬영 체크</h2><strong id="locPhotoTotal" role="status" aria-live="polite">0 / 32</strong></div>
-<p class="muted">휴대전화 앨범에 사진을 찍은 뒤 촬영 여부를 체크하세요. 연결된 현장 확인도 바로 체크할 수 있습니다. 사진 업로드는 필요하지 않습니다.</p>
+<section id="inspect" class="hidden"><div class="p noprint"><div class="inspect-heading"><button class="ghost" onclick="view('visits')">← 점검 목록</button><details class="inspect-options noprint"><summary>⋯ 메뉴</summary><div class="inspect-options-menu"><button onclick="q('.inspect-options').open=false;reload()">새로고침</button><button onclick="q('.inspect-options').open=false;shareB()">건물 링크 공유</button></div></details></div><h1 id="vt"></h1><div class="muted" id="sharedAddress"></div><div class="bar" style="margin-top:9px"><i id="bar"></i></div><div id="prog" class="muted"></div><div id="sync" class="muted">공용 점검 기록 · 15초 간격 자동 동기화</div></div><nav id="inspectTabs" class="workspace-tabs noprint" aria-label="점검 메뉴"><button id="wsTab-onsite" class="ws-tab active" data-ws-tab="onsite" onclick="setWorkspaceTab('onsite')"><span>01</span> 현장 체크</button><button id="wsTab-care" class="ws-tab" data-ws-tab="care" onclick="setWorkspaceTab('care')"><span>02</span> 관리 일정</button><button id="wsTab-photos" class="ws-tab" data-ws-tab="photos" onclick="setWorkspaceTab('photos')"><span>03</span> 사진함</button><button id="wsTab-evaluation" class="ws-tab" data-ws-tab="evaluation" onclick="setWorkspaceTab('evaluation')"><span>04</span> 정식 점검</button></nav><div class="workspace-pane" id="wsPane-onsite"><div class="p noprint location-photos" id="locationPhotos">
+<div class="check-title"><h2>장소별 촬영</h2><strong id="locPhotoTotal" role="status" aria-live="polite">0 / 32</strong></div>
+<p class="muted">휴대전화로 촬영한 항목만 체크하세요. 현장 확인 여부는 따로 기록됩니다.</p>
 <div class="bar"><i id="locPhotoBar"></i></div><div id="locPhotoRows"></div>
 <p class="check-note">사진 촬영과 현장 확인은 각각 저장됩니다. 촬영만 해도 점검평가가 자동 완료되지는 않습니다. 시설이 없는 항목은 비워두세요.</p></div>
-<div class="p noprint building-care" id="buildingCare">
+<div class="p noprint quick-panel"><details id="quickChecklist" open><summary>현장 간편 체크리스트 <span id="quickCount" class="muted">확인 0 / 16</span></summary><p class="quick-help">촬영 목록과 연결됩니다. 이 목록에는 직접 확인한 항목을 체크하세요.</p><div class="quick-progress"><i id="quickBar"></i></div><div id="quickRows"></div></details></div></div>
+<div class="workspace-pane hidden" id="wsPane-care"><div class="p noprint building-care" id="buildingCare">
 <div class="check-title"><h2>청소·유지관리 주기</h2><strong id="careTotal" role="status" aria-live="polite">관리 일정 0건</strong></div>
-<p class="muted">주기·최근 실시일을 기록하고 다음 예정일을 확인합니다. 같은 건물의 점검일에서 함께 확인할 수 있습니다.</p>
+<p class="muted">건축물별 관리 주기와 최근 실시일을 기록합니다. 다음 예정일은 자동 계산됩니다.</p>
 <p class="check-note" style="background:#fff6e7;padding:9px;border-radius:8px">아래 주기는 건물별로 설정하는 내부 관리 일정입니다. 법정 의무 점검·청소주기와 구분하세요.</p>
 <div id="careRows"></div></div>
-<div class="p noprint field-photos" id="fieldPhotos"><div class="field-head"><h2>현장 사진함</h2><strong id="fieldCount">미분류 0장</strong></div>
-<p class="muted">사진은 순서대로 찍지 않아도 됩니다. 먼저 모아 올리고, 나중에 항목별로 한꺼번에 정리하세요.</p>
+<div class="p noprint cycle-panel" id="cyclePanel"><details id="cycleChecklist"><summary><span>점검주기·교체시기 체크리스트</span><strong id="cycleCount">작성 0 / 9</strong></summary><p class="muted">매뉴얼의 기능 유지 3.2.1~3.2.9 항목입니다. 해당 항목의 관리 구분과 점검주기 또는 교체시기를 기록하세요.</p><div id="cycleRows"></div><p class="check-note">상세 점검표와 동일한 기록입니다. 주기 작성은 점검 결과의 ‘양호’ 판정이나 법정 점검 이행을 의미하지 않습니다.</p></details></div></div>
+<div class="workspace-pane hidden" id="wsPane-photos"><div class="p noprint field-photos" id="fieldPhotos"><div class="field-head"><h2>현장 사진함</h2><strong id="fieldCount">미분류 0장</strong></div>
+<p class="muted">사진을 순서와 관계없이 올리고 항목별로 정리하세요.</p>
 <div class="field-upload"><label class="pri field-upload-btn">사진 바로 찍기<input type="file" accept="image/*" capture="environment" hidden onchange="uploadFieldPhotos(this)"></label><label class="ghost field-upload-btn">앨범에서 여러 장<input type="file" accept="image/*" multiple hidden onchange="uploadFieldPhotos(this)"></label></div>
 <p id="fieldStatus" class="muted" role="status" aria-live="polite"></p>
 <details id="fieldDetails"><summary>사진 분류 · 항목 변경 <span id="fieldTotal">전체 0장</span></summary>
 <div class="field-filters"><label>보기<select id="fieldFilter" onchange="renderFieldPhotos()"><option value="unfiled">미분류만</option><option value="all">모든 사진</option></select></label><button class="ghost" onclick="selectFieldVisible(true)">전체 선택</button><button class="ghost" onclick="selectFieldVisible(false)">선택 해제</button></div>
 <div class="field-bulk"><label>사진을 이동할 항목<select id="fieldTarget"></select></label><button class="pri" onclick="assignFieldPhotos()">선택 사진 항목 지정</button><span id="fieldSelected" class="muted">0장 선택</span></div>
-<div class="field-grid" id="fieldGrid"></div></details></div><div class="p noprint quick-panel"><details id="quickChecklist" open><summary>현장 간편 체크리스트 <span id="quickCount" class="muted">확인 0 / 16</span></summary><p class="quick-help">장소별 촬영 체크와 연결됩니다. 현장 확인·촬영 여부를 각각 기록하며, 정식 평가 결과는 별도로 작성합니다.</p><div class="quick-progress"><i id="quickBar"></i></div><div id="quickRows"></div></details></div><div class="p noprint cycle-panel" id="cyclePanel"><details id="cycleChecklist"><summary><span>점검주기·교체시기 체크리스트</span><strong id="cycleCount">작성 0 / 9</strong></summary><p class="muted">매뉴얼의 기능 유지 3.2.1~3.2.9 항목입니다. 해당 항목의 관리 구분과 점검주기 또는 교체시기를 기록하세요.</p><div id="cycleRows"></div><p class="check-note">상세 점검표와 동일한 기록입니다. 주기 작성은 점검 결과의 ‘양호’ 판정이나 법정 점검 이행을 의미하지 않습니다.</p></details></div><div id="items"></div><div class="toolbar noprint"><button class="ghost" onclick="reload()">새로고침</button><button class="ghost" onclick="shareB()">링크 공유</button><button class="pri" onclick="showPhotoAlbum()">사진대장 보기</button><button class="pri" onclick="downloadPhotoBook('visit')">사진 JPG/PNG ZIP 다운로드</button><button class="ghost" onclick="report()">전체 보고서/PDF</button></div><div class="mobile-dock noprint"><button class="dock-main" onclick="jumpToLocationPhotos()">촬영 체크</button><button class="dock-main" onclick="jumpToCare()">청소 주기</button><details id="mobileActions" class="mobile-more"><summary>더보기</summary><div class="mobile-more-menu"><button onclick="q('#mobileActions').open=false;jumpToFieldPhotos()">사진 업로드·정리 <span id="fieldDock"></span></button><button onclick="q('#mobileActions').open=false;jumpToQuick()">간편 체크리스트</button><button onclick="q('#mobileActions').open=false;jumpToCycles()">점검주기·교체시기</button><button onclick="q('#mobileActions').open=false;showPhotoAlbum()">사진대장 보기</button><button onclick="q('#mobileActions').open=false;view('visits')">← 점검 목록</button><button onclick="q('#mobileActions').open=false;reload()">새로고침</button><button onclick="q('#mobileActions').open=false;shareB()">링크 공유</button><button onclick="q('#mobileActions').open=false;downloadPhotoBook('visit')">사진 ZIP 다운로드</button><button onclick="q('#mobileActions').open=false;report()">전체 보고서 / PDF</button></div></details></div></section>
+<div class="field-grid" id="fieldGrid"></div></details></div>
+<div class="p photo-exports noprint"><h2>사진대장 · 내보내기</h2><p class="muted">사진은 항목별로 정리해 JPG/PNG ZIP으로 저장할 수 있습니다. 업로드 과정에서 해상도가 축소될 수 있습니다.</p><div class="photo-export-buttons"><button class="ghost" onclick="showPhotoAlbum()">사진대장 보기</button><button class="pri" onclick="downloadPhotoBook('visit')">JPG/PNG ZIP 저장</button></div></div></div>
+<div class="workspace-pane hidden" id="wsPane-evaluation"><div class="p workspace-heading noprint"><h2>정식 점검 평가</h2><p class="muted">세부 점검항목을 분야별로 열어 평가합니다. 현장 체크만으로 평가 결과는 작성되지 않습니다.</p><button class="pri" onclick="report()">전체 보고서 / PDF</button></div><div id="items"></div></div>
+<nav class="workspace-bottom noprint" aria-label="모바일 점검 메뉴"><button class="ws-tab active" data-ws-tab="onsite" onclick="setWorkspaceTab('onsite')">현장</button><button class="ws-tab" data-ws-tab="care" onclick="setWorkspaceTab('care')">관리</button><button class="ws-tab" data-ws-tab="photos" onclick="setWorkspaceTab('photos')">사진</button><button class="ws-tab" data-ws-tab="evaluation" onclick="setWorkspaceTab('evaluation')">평가</button></nav></section>
 <section id="photoalbum" class="hidden"><div class="p album-back-wrap"><div class="album-actions noprint"><button class="ghost" onclick="backFromPhotoAlbum()">← 점검으로 돌아가기</button><button class="pri" onclick="downloadPhotoBook('visit')">사진 JPG/PNG ZIP 다운로드</button><button class="ghost" onclick="printPhotoAlbum()">PDF 저장 / 인쇄</button></div><p id="albumStatus" class="muted noprint"></p><div id="albumContent"></div><div class="album-back-fixed noprint"><button class="pri" onclick="backFromPhotoAlbum()">← 점검으로 돌아가기</button></div></div></section>
 <section id="report" class="hidden"><div class="p"><button class="ghost noprint" onclick="view('inspect')">← 점검으로</button><button class="pri noprint" onclick="print()" style="float:right">PDF 저장/인쇄</button><div id="rb"></div></div></section>
 </main><script>
@@ -290,6 +295,32 @@ const G={'3.1.1':['대지 조경 전체 전경','조경 수목·식재 및 시�
 const gen=['해당 항목 전체 전경','점검결과를 입증하는 상세 사진','해당없음·점검불가 근거 사진/자료'];
 const q=s=>s.startsWith('#')?document.getElementById(s.slice(1)):document.querySelector(s),E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(op,o={}){let h={'Content-Type':'application/json'};if(S.token)h.Authorization='Bearer '+S.token;let r=await fetch(base+'?op='+op+(o.q||''),{method:o.method||'GET',headers:h,body:o.body?JSON.stringify(o.body):undefined}),j=await r.json().catch(()=>({error:'응답 오류'}));if(r.status===401&&op!=='login'){sessionStorage.removeItem('sangeoInspectionToken');localStorage.removeItem('sgToken');location.reload();throw Error(j.error||'로그인 만료')}if(!r.ok)throw Error(j.error||'요청 실패');return j}
+
+const WORKSPACE_TABS=['onsite','care','photos','evaluation'];
+let currentWorkspaceTab='onsite';
+function setWorkspaceTab(tab,scroll=true){
+ if(!WORKSPACE_TABS.includes(tab))return;
+ currentWorkspaceTab=tab;
+ for(const key of WORKSPACE_TABS){
+  const pane=document.getElementById('wsPane-'+key);
+  if(pane)pane.classList.toggle('hidden',key!==tab);
+ }
+ document.querySelectorAll('[data-ws-tab]').forEach(button=>{
+  const selected=button.dataset.wsTab===tab;
+  button.classList.toggle('active',selected);
+  button.setAttribute('aria-current',selected?'page':'false');
+ });
+ if(scroll){
+  const nav=window.matchMedia('(max-width:680px)').matches?q('#inspect'):q('#inspectTabs');
+  nav?.scrollIntoView({behavior:'smooth',block:'start'});
+ }
+}
+function jumpWorkspace(tab,selector,prepare){
+ setWorkspaceTab(tab,false);
+ const target=document.querySelector(selector);
+ if(target&&prepare)prepare(target);
+ requestAnimationFrame(()=>target?.scrollIntoView({behavior:'smooth',block:'start'}));
+}
 function view(id){['setup','login','dash','visits','inspect','photoalbum','report','settings'].forEach(x=>q('#'+x).classList.toggle('hidden',x!==id))}
 function goDash(){history.replaceState(null,'',location.pathname);view('dash')}
 async function boot(){try{let st=await api('status');if(!st.configured)return view('setup');if(!S.token)return view('login');S.me=await api('me');q('#logoutBtn').classList.remove('hidden');q('#manageBtn').classList.remove('hidden');q('#who').textContent='공용 점검 계정';await loadB();const url=new URL(location.href),buildingId=url.searchParams.get('building'),visitId=url.searchParams.get('visit');if(buildingId&&S.bs.some(x=>x.id===buildingId)){await openB(buildingId);if(visitId&&S.vs.some(x=>x.id===visitId))await openV(visitId)}else view('dash');startSync()}catch(e){alert(e.message);view('login')}}
@@ -916,6 +947,7 @@ async function openV(id){
  q('#vt').textContent=S.b.name+' · '+j.visit.inspection_on;
  q('#sharedAddress').textContent=S.b.address||'주소 미등록 · 점검 목록에서 주소를 등록해 주세요.';
  render();renderFieldPhotos();renderLocationShots();renderCareSchedules();renderPeriods();
+ setWorkspaceTab('onsite',false);
  q('#fieldDetails').open=(j.photos||[]).some(p=>p.item_key==='inbox');
  view('inspect');
  q('#sync').textContent='공유 기록 · 15초 간격 자동 동기화';
