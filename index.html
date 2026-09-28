@@ -287,6 +287,20 @@ button:focus-visible,.camera-action:focus-within,input:focus-visible,textarea:fo
 @media(max-width:350px){.workspace-bottom button{font-size:14px}}
 @media print{.workspace-tabs,.workspace-bottom,.inspect-options{display:none!important}}
 
+
+.visit-card{display:flex;align-items:center;gap:9px;padding:9px 12px!important}
+.visit-open{flex:1;min-width:0;text-align:left;background:transparent;color:#263849;min-height:57px;padding:7px 5px}
+.visit-open strong{display:block;font-size:17px;line-height:1.35}
+.visit-open span{display:block;font-size:13px;font-weight:500;margin-top:3px;color:#586c7c}
+.visit-open:hover{background:#f1f8fc}
+.visit-trash-button{background:#fff0f0;color:#a32d34;border:1px solid #ebc9c8;min-height:45px;flex-shrink:0;font-size:13px}
+.visit-trash>summary{cursor:pointer;font-weight:750;font-size:15px;padding:11px 0;min-height:44px}
+.trashed-entry{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 0;border-bottom:1px solid #e2e8ee}
+.trashed-entry b{display:block;font-size:15px}
+.trashed-entry small{display:block;font-size:12px;margin-top:4px;color:#536779}
+.trashed-entry button{flex-shrink:0;min-height:45px;font-size:14px;background:#e5f4fa;color:#00688e}
+@media(max-width:680px){.visit-card{padding:9px!important}.visit-open strong{font-size:16px}.visit-trash-button{min-height:45px;padding:10px 12px}}
+
 </style></head><body><header><div class="header-brand"><strong>SANGEO <span>ARCHITECTURE</span></strong><small>건축물 정기점검 · 공용 접속</small></div><div class="header-tools noprint"><button id="manageBtn" class="ghost hidden" onclick="view('settings')">설정</button><button id="logoutBtn" class="ghost hidden" onclick="logout()">로그아웃</button></div></header><main>
 <section id="settings" class="p hidden"><button class="ghost" onclick="view('dash')">← 건물 목록</button><h1>공용 접속 비밀번호</h1><p class="muted">관리자·직원 구분 없이 같은 비밀번호를 사용합니다. 변경하려면 현재 비밀번호가 필요하며, 변경 후 다른 기기의 로그인은 만료됩니다.</p><div class="stack"><input id="currentPass" type="password" autocomplete="current-password" placeholder="현재 비밀번호"><input id="newPass" type="password" autocomplete="new-password" placeholder="새 비밀번호 (8자 이상)"><input id="newPassConfirm" type="password" autocomplete="new-password" placeholder="새 비밀번호 확인"><button class="pri" onclick="changePassword()">공용 비밀번호 변경</button></div></section><section id="setup" class="p hidden"><h1>최초 설정</h1><div class="stack"><input id="scode" placeholder="초기 설정 코드"><input id="sp" type="password" autocomplete="new-password" placeholder="공용 비밀번호 (8자 이상)"><button class="pri" onclick="setup()">설정 완료</button></div></section>
 <section id="login" class="p hidden"><h1>공용 접속</h1><p class="muted">공통 비밀번호 하나로 건물과 점검 기록을 이용합니다.</p><div class="stack"><input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()"><button class="pri" onclick="login()">접속</button></div></section>
