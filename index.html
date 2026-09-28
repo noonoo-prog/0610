@@ -472,9 +472,8 @@ function renderFieldPhotos(){
  q('#fieldSelected').textContent=fieldSelected.size+'장 선택';
 }
 function jumpToFieldPhotos(){
- if(q('#mobileActions'))q('#mobileActions').open=false;
  q('#fieldDetails').open=true;
- q('#fieldPhotos').scrollIntoView({behavior:'smooth',block:'start'});
+ jumpWorkspace('photos','#fieldPhotos');
 }
 async function uploadFieldPhotos(input){
  const files=Array.from(input.files||[]);if(!files.length)return;
@@ -585,9 +584,7 @@ function renderLocationShots(){
  }).join('');
 }
 function jumpToLocationPhotos(){
- if(q('#mobileActions'))q('#mobileActions').open=false;
- q('#locPhotoRows').querySelector('details')?.setAttribute('open','');
- q('#locationPhotos').scrollIntoView({behavior:'smooth',block:'start'});
+ jumpWorkspace('onsite','#locationPhotos');
 }
 async function saveLocationShot(key,checked){
  if(!S.v||!SHOT_KEYS.includes(key))return;
@@ -665,8 +662,7 @@ function renderCareSchedules(){
  updateCareCounts();
 }
 function jumpToCare(){
- if(q('#mobileActions'))q('#mobileActions').open=false;
- q('#buildingCare').scrollIntoView({behavior:'smooth',block:'start'});
+ jumpWorkspace('care','#buildingCare');
 }
 function markCareEdited(key){
  const row=document.getElementById('careTask-'+key);
@@ -755,10 +751,9 @@ function jumpToShotFromQuick(key){
  const shots=QUICK_SHOT_MAP[key]||[];
  if(!shots.length)return jumpToLocationPhotos();
  const target=shots.find(shot=>!shotRow(shot)?.checked)||shots[0];
- if(q('#mobileActions'))q('#mobileActions').open=false;
- const group=document.querySelector('[data-shot-row="'+target+'"]')?.closest('.location-place');
- if(group)group.open=true;
- requestAnimationFrame(()=>document.querySelector('[data-shot-row="'+target+'"]')?.scrollIntoView({behavior:'smooth',block:'center'}));
+ jumpWorkspace('onsite','[data-shot-row="'+target+'"]',row=>{
+  const group=row.closest('.location-place');if(group)group.open=true;
+ });
 }
 
 function quickRow(key){return(S.v?.quick||[]).find(r=>r.item_key===key);}
@@ -792,16 +787,15 @@ function renderQuick(){
  q('#quickRows').innerHTML=quickMarkup();
 }
 function goQuickDetail(key){
- q('#quickChecklist').open=false;
  const group=key.split('.').slice(0,2).join('.');
- const section=document.querySelector('[data-inspection-group="'+group+'"]');
- if(section)section.open=true;
- requestAnimationFrame(()=>document.getElementById('card-'+key)?.scrollIntoView({behavior:'smooth',block:'start'}));
+ jumpWorkspace('evaluation','[id="card-'+key+'"]',()=>{
+  const section=document.querySelector('[data-inspection-group="'+group+'"]');
+  if(section)section.open=true;
+ });
 }
 function jumpToQuick(){
- const menu=q('#mobileActions');if(menu)menu.open=false;
  q('#quickChecklist').open=true;
- q('#quickChecklist').scrollIntoView({behavior:'smooth',block:'start'});
+ jumpWorkspace('onsite','#quickChecklist');
 }
 function quickStateChanged(previous,next){
  const one=new Map((previous.quick||[]).map(x=>[x.item_key,x]));
@@ -899,9 +893,8 @@ function markPeriod(k){
  document.getElementById('pcRow-'+k)?.classList.toggle('edited',periodRowDirty(k));
 }
 function jumpToCycles(){
- const menu=q('#mobileActions');if(menu)menu.open=false;
  q('#cycleChecklist').open=true;
- q('#cyclePanel').scrollIntoView({behavior:'smooth',block:'start'});
+ jumpWorkspace('care','#cyclePanel');
 }
 function itemDraft(k){
  const d=D(k),m=d.management||{},fields=formFields(k);
