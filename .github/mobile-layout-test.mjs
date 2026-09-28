@@ -60,7 +60,7 @@ try {
    await page.getByRole('button', { name: '전체 선택', exact: true }).click();
    await page.locator('#fieldTarget').selectOption('3.1.1');
    await page.getByRole('button', { name: '선택 사진 항목 지정', exact: true }).click();
-   if ((await page.locator('#fieldCount').textContent()) !== '미분류 0장') throw Error('Assigned photos still unclassified');
+   await page.waitForFunction(() => document.getElementById('fieldCount')?.textContent === '미분류 0장', null, { timeout: 8000 });
    if ((await page.locator('[id="card-3.1.1"] .thumb').count()) !== 2) throw Error('Assigned photos not moved to landscaping');
    await page.locator('#fieldFilter').selectOption('all');
    if ((await page.locator('#fieldGrid .field-tile').count()) !== 2) throw Error('All photos view missing reclassified items');
