@@ -1,0 +1,31 @@
+name: Verify SANGEO mobile layout
+on:
+  workflow_run:
+    workflows: ["Deploy SANGEO Inspection"]
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mobile-layout:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser runner
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install chromium
+      - name: Check phone widths and desktop fallback
+        run: node .github/mobile-layout-test.mjs
+      - name: Save mobile screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: inspection-mobile-390
+          path: /tmp/sangeo-mobile-390.png
+          if-no-files-found: ignore
