@@ -329,6 +329,7 @@ button:focus-visible,.camera-action:focus-within,input:focus-visible,textarea:fo
 @media print{.workflow-summary,.evaluation-tools,.evaluation-filter,.check-toolbar,.field-toast{display:none!important}.filter-hidden{display:block!important}}
 @media(prefers-reduced-motion:reduce){.field-toast{transition:none}}
 
+.filter-empty{margin:10px 0;padding:16px 12px;text-align:center;border-radius:10px;background:#f1f8fc;color:#426075;border:1px dashed #bdd5e3;font-size:14px;font-weight:650;line-height:1.55}
 </style></head><body><header><div class="header-brand"><strong>SANGEO <span>ARCHITECTURE</span></strong><small>건축물 정기점검 · 공용 접속</small></div><div class="header-tools noprint"><button id="manageBtn" class="ghost hidden" onclick="view('settings')">설정</button><button id="logoutBtn" class="ghost hidden" onclick="logout()">로그아웃</button></div></header><main>
 <section id="settings" class="p hidden"><button class="ghost" onclick="view('dash')">← 건물 목록</button><h1>공용 접속 비밀번호</h1><p class="muted">관리자·직원 구분 없이 같은 비밀번호를 사용합니다. 변경하려면 현재 비밀번호가 필요하며, 변경 후 다른 기기의 로그인은 만료됩니다.</p><div class="stack"><input id="currentPass" type="password" autocomplete="current-password" placeholder="현재 비밀번호"><input id="newPass" type="password" autocomplete="new-password" placeholder="새 비밀번호 (8자 이상)"><input id="newPassConfirm" type="password" autocomplete="new-password" placeholder="새 비밀번호 확인"><button class="pri" onclick="changePassword()">공용 비밀번호 변경</button></div></section><section id="setup" class="p hidden"><h1>최초 설정</h1><div class="stack"><input id="scode" placeholder="초기 설정 코드"><input id="sp" type="password" autocomplete="new-password" placeholder="공용 비밀번호 (8자 이상)"><button class="pri" onclick="setup()">설정 완료</button></div></section>
 <section id="login" class="p hidden"><h1>공용 접속</h1><p class="muted">공통 비밀번호 하나로 건물과 점검 기록을 이용합니다.</p><div class="stack"><input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()"><button class="pri" onclick="login()">접속</button></div></section>
@@ -694,6 +695,7 @@ async function assignFieldPhotos(){
   renderFieldPhotos();renderQuick();
   q('#fieldStatus').textContent=result.photos.length+'장을 '+fieldName(target)+' 항목으로 이동했습니다.';
   q('#sync').textContent='사진 분류 공유 저장 완료';
+  announceSaved('사진 '+result.photos.length+'장 분류 저장됨');
  }catch(e){
   try{
    const latest=await api('visit',{q:'&id='+encodeURIComponent(visitId)});
@@ -771,6 +773,7 @@ async function saveLocationShot(key,checked){
   S.v.photo_checks=(S.v.photo_checks||[]).filter(x=>x.check_key!==key).concat(result.photo_check);
   renderLocationShots();renderQuick();
   q('#sync').textContent='사진 촬영 체크 저장 완료 · 공용 기록에 반영';
+  announceSaved('촬영 체크 저장됨');
  }catch(e){
   try{const latest=await api('visit',{q:'&id='+encodeURIComponent(visitId)});
     if(S.v?.visit.id===visitId){S.v.photo_checks=latest.photo_checks;renderLocationShots();renderQuick();}
@@ -873,6 +876,7 @@ async function saveCareTask(key,today){
   S.v.care_schedules=(S.v.care_schedules||[]).filter(x=>x.task_key!==key).concat(response.care_schedule);
   updateCareTask(key);
   q('#sync').textContent='건물 관리일정 저장 완료 · 공용 기록에 반영';
+  announceSaved('관리 일정 저장됨');
  }catch(error){
   try{const latest=await api('visit',{q:'&id='+encodeURIComponent(S.v.visit.id)});
    if(S.v?.building.id===buildingId){
@@ -927,6 +931,9 @@ function jumpToShotFromQuick(key){
  const shots=QUICK_SHOT_MAP[key]||[];
  if(!shots.length)return jumpToLocationPhotos();
  const target=shots.find(shot=>!shotRow(shot)?.checked)||shots[0];
+ if(q('#shotOnlyOpen').checked&&shotRow(target)?.checked){
+  q('#shotOnlyOpen').checked=false;applyShotFilter();
+ }
  jumpWorkspace('onsite','[data-shot-row="'+target+'"]',row=>{
   const group=row.closest('.location-place');if(group)group.open=true;
  });
@@ -964,6 +971,11 @@ function renderQuick(){
  applyQuickFilter();updateOverview();
 }
 function goQuickDetail(key){
+ if(q('#evalOnlyOpen').checked&&D(key).result)q('#evalOnlyOpen').checked=false;
+ const title=gs.flatMap(g=>g[2]).find(item=>item[0]===key)?.[1]||'';
+ const search=q('#evalSearch').value.trim().toLowerCase();
+ if(search&&!(key+' '+title).toLowerCase().includes(search))q('#evalSearch').value='';
+ applyEvalFilter();
  const group=key.split('.').slice(0,2).join('.');
  jumpWorkspace('evaluation','[id="card-'+key+'"]',()=>{
   const section=document.querySelector('[data-inspection-group="'+group+'"]');
@@ -992,6 +1004,7 @@ async function setQuick(key,value){
   S.v.quick=(S.v.quick||[]).filter(x=>x.item_key!==key).concat(result.quick);
   renderQuick();renderLocationShots();
   q('#sync').textContent='간편 체크 저장 완료 · 공용 기록에 반영';
+  announceSaved('현장 확인 저장됨');
  }catch(e){
   try{
    const current=await api('visit',{q:'&id='+encodeURIComponent(visitId)});
@@ -1101,6 +1114,7 @@ async function savePeriod(k){
   if(index>=0)S.v.items[index]=j.item;else S.v.items.push(j.item);
   refreshCard(k,false);refreshPeriod(k);
   q('#sync').textContent='주기·교체시기 저장 완료 · 상세 점검표와 연동됨';
+  announceSaved('점검·교체주기 저장됨');
  }catch(error){
   try{
    const latest=await api('visit',{q:'&id='+encodeURIComponent(visitId)});
@@ -1163,26 +1177,25 @@ async function reload(){
 }
 async function setS(k,v){
  if(PERIOD_KEYS.has(k)&&periodRowDirty(k))return alert('주기 체크리스트의 입력을 먼저 저장해 주세요.');
- const d=D(k);d.result=v;
- if(!S.v.items.some(x=>x.item_key===k))S.v.items.push(d);
- await saveI(k);
+ await saveI(k,v);
 }
 function mg(k){
  if(!k.startsWith('3.2.'))return {};
  return {location:q('#loc-'+k)?.value||'',other:q('#oth-'+k)?.value||'',action:q('#act-'+k)?.value||'',
  cycle:q('#cy-'+k)?.value||null,replace_year:q('#yr-'+k)?.value||null,basis:q('#bs-'+k)?.value||''};
 }
-async function saveI(k){
+async function saveI(k,selectedResult){
  if(PERIOD_KEYS.has(k)&&periodRowDirty(k))return alert('주기 체크리스트의 입력을 먼저 저장해 주세요.');
  const d=D(k),oldId=S.v.visit.id;
  writing++;
  try{
-  const j=await api('item',{method:'PUT',body:{visit_id:oldId,item_key:k,result:d.result,note:q('#nt-'+k).value,management:mg(k),expected_updated_at:d.updated_at||null}});
+  const j=await api('item',{method:'PUT',body:{visit_id:oldId,item_key:k,result:selectedResult===undefined?d.result:selectedResult,note:q('#nt-'+k).value,management:mg(k),expected_updated_at:d.updated_at||null}});
   if(!S.v||S.v.visit.id!==oldId)return;
   const ix=S.v.items.findIndex(x=>x.item_key===k);
   if(ix>=0)S.v.items[ix]=j.item;else S.v.items.push(j.item);
   refreshCard(k);refreshPeriod(k);
   q('#sync').textContent='점검 기록 저장 완료 · 공용 기록에 반영';
+  announceSaved('정식 점검 저장됨');
  }catch(e){alert(e.message)}finally{writing--}
 }
 function changedKeys(oldVisit,newVisit){
