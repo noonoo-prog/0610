@@ -115,7 +115,7 @@ try{
   assert(await page.locator('#wsPane-photos').isVisible(),'Photo page hidden');
   assert((await page.locator('.photo-export-buttons button').count())===2,'Photo exports unavailable');
   if(width===390){
-   await page.locator('#fieldDetails > summary').click();
+   if (!(await page.locator('#fieldDetails').evaluate(el=>el.open))) await page.locator('#fieldDetails > summary').click();
    await page.getByRole('button',{name:'전체 선택',exact:true}).click();
    await page.locator('#fieldTarget').selectOption('3.1.1');
    await page.getByRole('button',{name:'선택 사진 항목 지정',exact:true}).click();
@@ -138,6 +138,7 @@ try{
    await page.locator('[id="pcRow-3.2.1"] .cycle-buttons .ghost').click();
    assert(await page.locator('#wsPane-evaluation').isVisible(),'Cycle -> detail tab navigation broken');
    await page.getByRole('button',{name:'현장',exact:true}).click();
+   if (!(await page.locator('details.quick-group[data-group="3.5"]').evaluate(el=>el.open))) await page.locator('details.quick-group[data-group="3.5"] > summary').click();
    await page.locator('.quick-detail[data-key="3.5.4"]').click();
    assert(await page.locator('#wsPane-evaluation').isVisible(),'Quick -> detail tab navigation broken');
   }
@@ -150,7 +151,7 @@ try{
    await page.waitForFunction(()=>document.getElementById('trashCount')?.textContent==='1건');
    assert(state.trashed,'Trash operation was not called');
    assert(state.photos.length===2&&state.items.length===1,'Trash destroyed photo/inspection data');
-   await page.locator('#visitTrash > summary').click().catch(()=>{});
+   if (!(await page.locator('#visitTrash').evaluate(el=>el.open))) await page.locator('#visitTrash > summary').click();
    await page.locator('#trashList button').click();
    await page.waitForFunction(()=>document.getElementById('trashCount')?.textContent==='0건');
    assert(!state.trashed,'Restore operation was not called');
