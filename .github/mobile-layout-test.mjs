@@ -16,9 +16,20 @@ try {
  for (const width of [320, 390, 430]) {
   const page = await browser.newPage({ viewport: { width, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
   await page.addInitScript(() => sessionStorage.setItem('sangeoInspectionToken', 'sg_mock_for_layout'));
+  const mockPhotoId1 = '30000000-0000-4000-8000-000000000003';
+  const mockPhotoId2 = '30000000-0000-4000-8000-000000000004';
+  const photos = width === 390 ? [mockPhotoId1,mockPhotoId2].map((id,i)=>({id,item_key:'inbox',url:'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=',caption:'',original_name:'현장'+(i+1)+'.jpg',created_at:'2026-09-28T03:00:0'+i+'Z'})) : [];
   await page.route('**/functions/v1/sangeo-inspection*', async route => {
    const op = new URL(route.request().url()).searchParams.get('op');
-   await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mock[op] ?? { ok: true }) });
+   if(op==='photo-category'){
+    const body=route.request().postDataJSON();
+    if(body.item_key!=='3.1.1'||body.moves.length!==2||body.moves.some(p=>p.from!=='inbox')) throw Error('Incorrect bulk assignment request');
+    const changed=body.moves.map(p=>({id:p.id,item_key:body.item_key}));
+    for(const photo of photos)if(changed.some(p=>p.id===photo.id))photo.item_key=body.item_key;
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({photos:changed})});
+   }
+   const value=op==='visit'?{...mock.visit,photos}:mock[op]??{ok:true};
+   await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(value) });
   });
   await page.goto(origin + '?building=' + buildingId + '&visit=' + visitId, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.locator('#inspect:not(.hidden)').waitFor({ timeout: 15000 });
@@ -44,6 +55,16 @@ try {
   await page.locator('#mobileActions > summary').click();
   await page.getByRole('button', { name: /사진 정리/ }).click();
   if (!(await page.locator('#fieldDetails').evaluate(el => el.open))) throw Error('Photo inbox jump failed');
+  if (width === 390) {
+   if (!(await page.locator('#fieldCount').textContent()).includes('미분류 2장')) throw Error('Unsorted photos missing');
+   await page.getByRole('button', { name: '전체 선택', exact: true }).click();
+   await page.locator('#fieldTarget').selectOption('3.1.1');
+   await page.getByRole('button', { name: '선택 사진 항목 지정', exact: true }).click();
+   if ((await page.locator('#fieldCount').textContent()) !== '미분류 0장') throw Error('Assigned photos still unclassified');
+   if ((await page.locator('[id="card-3.1.1"] .thumb').count()) !== 2) throw Error('Assigned photos not moved to landscaping');
+   await page.locator('#fieldFilter').selectOption('all');
+   if ((await page.locator('#fieldGrid .field-tile').count()) !== 2) throw Error('All photos view missing reclassified items');
+  }
   await page.locator('#mobileActions > summary').click();
   await page.getByRole('button', { name: '간편 체크리스트', exact: true }).click();
   if (!(await page.locator('#quickChecklist').evaluate(el => el.open))) throw Error('Checklist jump failed');
