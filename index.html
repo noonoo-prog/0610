@@ -27,6 +27,7 @@
 .sprite-art{position:relative}.gear{display:block;background-image:url('./assets/wardrobe-v1.webp');background-size:300% 200%;background-repeat:no-repeat;image-rendering:pixelated;pointer-events:none}
 .gear-thumb{width:90px;height:90px;margin:0 auto}.worn{position:absolute;z-index:2}.worn.outfit{width:65%;height:47%;left:17%;top:52%}.mood-1 .worn.outfit,.mood-2 .worn.outfit{top:47%;height:53%}.worn.ribbon{width:29%;height:28%;left:58%;top:10%;z-index:4}.worn.glasses{width:56%;height:52%;left:23%;top:24%;z-index:4}.mood-1 .worn.glasses,.mood-2 .worn.glasses{top:15%}.worn.bag{width:42%;height:47%;left:33%;top:53%;z-index:3}
 .wardrobe-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.wardrobe-choice{display:flex;align-items:center;flex-direction:column;padding:9px;font-size:13px}.wardrobe-choice small{display:block;font-size:11px;margin-top:5px}.wardrobe-choice[aria-pressed=true]{background:#fff2d6;outline:2px solid #dca44c}@media(max-width:480px){.wardrobe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.species-0 .worn.outfit{left:22%}.species-0 .worn.glasses{left:28%}
 </style></head><body><div id="app"></div><dialog id="modal"></dialog><div id="toast" class="toast" hidden role="status"></div>
 <script>
 'use strict';
