@@ -348,4 +348,4 @@ doha:{title:'배달 없는 일요일',place:'강변 자전거길',decoration:'�
 };
 function confessionFor(id){return FINAL_SCENES[id]}
 function dateFor(id){return COUPLE_DATES[id]}
-render();
+/* Initial render handled by romance-special.js */
