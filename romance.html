@@ -214,7 +214,7 @@ const c=cast(scene.id), data=scene.data, done=step>=data.lines.length;
 let line=done?null:data.lines[step];
 let body='<div class="story-app"><div class="story-top"><div class="brand">거봉동네<small>'+esc(data.title)+' · DAY '+state.day+'</small></div><button class="btn ghost" onclick="leaveScene()">돌아가기</button></div><div class="progress" aria-hidden="true"><span style="width:'+((step+1)/(data.lines.length+1)*100)+'%"></span></div><div class="story-scene" style="--scene-bg:'+c.bg+'">'+scenePicture(c,line)+'</div><section class="story-box" aria-live="polite">';
 if(result){
-body+='<div class="speaker">'+c.name+' · '+esc(data.title)+'</div><p class="line">'+esc(result.text)+'</p><p class="result-heart">'+(result.score?'♥ +'+result.score:'♥ 마음의 거리 그대로')+'</p>'+(result.ending?'<h2 style="margin:10px 0">ENDING · '+esc(c.ending)+'</h2><p class="sub">'+esc(c.endingText)+'</p>':'')+'<div class="story-controls"><button class="btn primary" onclick="leaveScene()">동네로 돌아가기</button></div>';
+body+='<div class="speaker">'+c.name+' · '+esc(data.title)+'</div><p class="line">'+esc(result.text)+'</p><p class="result-heart">'+(result.score?'♥ +'+result.score:'♥ 마음의 거리 그대로')+'</p>'+(result.newCG?'<div class="notice">✦ 새로운 이벤트 CG를 발견했어요! 추억 앨범에 보관됩니다.</div>':'')+(result.secret?'<div class="notice">숨겨진 이야기를 발견했어요.</div>':'')+(result.ending?'<h2 style="margin:10px 0">ENDING · '+esc(c.ending)+'</h2><p class="sub">'+esc(c.endingText)+'</p>':'')+'<div class="story-controls"><button class="btn primary" onclick="leaveScene()">동네로 돌아가기</button></div>';
 }else if(!done){
 body+='<div class="speaker">'+esc(line[0])+'</div><p class="line">'+esc(line[1])+'</p><div class="story-controls"><button class="btn primary" onclick="nextLine()">다음 이야기 →</button></div>';
 }else{
@@ -226,7 +226,7 @@ function nextLine(){if(!scene||result)return;step=Math.min(scene.data.lines.leng
 function chooseAnswer(i){
 if(!scene||result||step<scene.data.lines.length)return;
 let d=scene.data,ch=d.choices[i];if(!ch)return;
-const id=scene.id,c=cast(id),type=scene.type,score=ch[1];const earned=!!(type==='confession'&&i===0&&!state.partner);
+const id=scene.id,c=cast(id),type=scene.type,score=ch[1];const newCG=!!(scene.cgId&&!gallery.cgs[scene.cgId]);const earned=!!(type==='confession'&&i===0&&!state.partner);
 state.energy=Math.max(0,state.energy-1);
 state.aff[id]=Math.min(10,affection(id)+score);
 state.last[id]=state.day;
@@ -237,7 +237,7 @@ if(earned){state.partner=id;gallery[id]=true}
 if(type==='event'||type==='secret'||earned)saveGallery()
 state.history.unshift({id,day:state.day,title:earned?'ENDING · '+c.ending:d.title,text:ch[2]});
 state.history=state.history.slice(0,70);
-save();result={score:score,text:ch[2],ending:earned};renderScene();
+save();result={score:score,text:ch[2],ending:earned,newCG:newCG,secret:type==='secret'};renderScene();
 }
 function leaveScene(){scene=null;result=null;page='home';render()}
 document.addEventListener('keydown',function(e){
