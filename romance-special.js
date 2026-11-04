@@ -40,6 +40,9 @@ function initSpecial(){
 if(!Array.isArray(state.secretSeen))state.secretSeen=[];
 if(!gallery.cgs||typeof gallery.cgs!=='object')gallery.cgs={};
 if(!gallery.secrets||typeof gallery.secrets!=='object')gallery.secrets={};
+let changed=false;
+for(const entry of CGS){if(!entry.secret&&chapter(entry.who)>entry.chapter&&!gallery.cgs[entry.id]){gallery.cgs[entry.id]=true;changed=true}}
+if(changed)saveGallery();
 }
 function cgInfo(id){return CGS.find(x=>x.id===id)}
 function cgForEvent(id,type,n){return type==='event'?CGS.find(x=>!x.secret&&x.who===id&&x.chapter===n):null}
