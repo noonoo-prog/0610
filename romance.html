@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff4f0">
+<meta name="description" content="거봉동네의 작은 만남이 사랑이 되는 이야기. 선택지로 호감도를 쌓고 네 가지 연애 엔딩을 발견하세요.">
+<title>거봉동네 · 우연이 사랑이 될 때</title>
+<style>
+:root{color-scheme:light;--ink:#332a3b;--muted:#796d80;--line:#ecdce5;--pink:#e86d93;--purple:#7f67a7;--paper:#fffbfd;--shadow:0 18px 55px #56334912}
+*{box-sizing:border-box}
+body{margin:0;min-height:100svh;background:radial-gradient(circle at 10% 8%,#ffe7df 0,transparent 30%),radial-gradient(circle at 95% 20%,#eee0ff 0,transparent 34%),#fff8f6;color:var(--ink);font:16px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button{font:inherit;border:0;cursor:pointer;touch-action:manipulation}
+button:focus-visible,a:focus-visible{outline:3px solid #8d53a9;outline-offset:3px}
+button:disabled{opacity:.47;cursor:not-allowed}
+a{color:inherit}
+.wrap{max-width:1110px;margin:auto;padding:24px 22px 46px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:24px}
+.brand{font-size:24px;font-weight:900;letter-spacing:-1.2px}
+.brand small{display:block;font-size:11px;letter-spacing:2px;font-weight:800;color:var(--purple)}
+.link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:1px solid #e6d5e1;background:#fff9fc;border-radius:14px;padding:11px 16px;font-weight:800;min-height:44px}
+.pill{display:inline-block;border-radius:99px;background:#fff0f5;color:#a94e76;font-size:12px;font-weight:900;letter-spacing:.3px;padding:5px 11px}
+.stat{display:inline-flex;align-items:center;gap:7px;border:1px solid #efdfe8;border-radius:13px;padding:8px 12px;background:#fffafc;font-size:13px;font-weight:800}
+.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(27px,4.4vw,45px);line-height:1.25;letter-spacing:-1.8px}
+h2{font-size:clamp(22px,3vw,28px);line-height:1.35;letter-spacing:-.8px}
+h3{font-size:17px;letter-spacing:-.35px}
+p{line-height:1.75}
+.sub{color:var(--muted);font-size:14px}
+.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:25px;align-items:center;background:linear-gradient(125deg,#fff,#fff3f5 70%,#efe1fa);border:1px solid #f2e4eb;border-radius:30px;padding:32px 35px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+.hero:before{content:"✦";position:absolute;right:25%;top:13px;font-size:42px;color:#e9b8ce66}
+.hero h1{margin:13px 0 12px}
+.hero .desc{color:#675b69;max-width:550px}
+.hero-art{position:relative;min-height:235px;display:grid;place-items:center}
+.hero-art:before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:#ffdedf;filter:blur(2px)}
+.hero-art:after{content:"♥";position:absolute;top:0;right:10%;font-size:44px;color:#e99abe;transform:rotate(13deg)}
+.hero-art .avatar{position:relative;z-index:1;width:220px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.btn{border-radius:14px;padding:12px 18px;font-weight:850;background:#f9edf2;color:#5b4960;border:1px solid #ecdbe4;min-height:46px;box-shadow:0 3px 0 #48293b08}
+.btn:hover:not(:disabled){filter:brightness(.98);transform:translateY(-1px)}
+.btn.primary{color:#fff;background:#a35d8b;border-color:#a35d8b}
+.btn.light{background:#fff}
+.btn.ghost{background:transparent;border-color:#d8cbd6}
+.btn.full{width:100%}
+.menu{display:flex;gap:8px;overflow-x:auto;margin:20px 0;padding:3px 2px 6px}
+.menu .btn{white-space:nowrap}
+.menu .btn.active{color:#fff;background:#5b465f;border-color:#5b465f}
+.section-header{margin:27px 0 14px;display:flex;align-items:end;justify-content:space-between;gap:12px}
+.section-header p{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.npc{position:relative;background:#fff;border:1px solid #f0e4eb;border-radius:22px;padding:17px;box-shadow:0 10px 25px #4d2f4810;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.npc:before{content:"";position:absolute;left:0;top:0;right:0;height:5px;background:var(--accent,#e7a2be)}
+.npc .portrait-box{display:grid;place-items:center;min-height:170px;background:var(--bg,#fff0f4);border-radius:17px;margin:8px 0 13px;position:relative;overflow:hidden}
+.npc .portrait-box:after{content:"♥";position:absolute;right:12px;top:4px;color:#ffffff95;font-size:38px}
+.npc .avatar{position:relative;z-index:1;width:168px}
+.npc .name{font-size:20px;font-weight:900;line-height:1.3}
+.npc .job{font-size:12px;color:#876f83;margin:4px 0 8px;min-height:20px}
+.npc .quote{color:#655767;font-size:13px;min-height:70px;flex:1}
+.npc .btn{margin-top:14px;width:100%;font-size:14px}
+.aff{display:flex;gap:5px;align-items:center;margin-top:11px}
+.aff i{height:7px;border-radius:8px;background:#f2e5eb;flex:1;min-width:0}
+.aff i.on{background:#e77c9b}
+.aff-text{font-size:12px;color:#9b5279;font-weight:900;margin-top:5px}
+.avatar{aspect-ratio:1;display:grid;place-items:center}
+.avatar .sprite{width:87%;background-repeat:no-repeat;image-rendering:pixelated;filter:drop-shadow(0 5px 2px #4530400e)}
+.panel{background:#fff;border:1px solid #f0e4eb;border-radius:23px;padding:23px;box-shadow:var(--shadow)}
+.relation{display:grid;grid-template-columns:115px 1fr;gap:20px;align-items:center;border-bottom:1px solid var(--line);padding:16px 0}
+.relation:last-child{border-bottom:0}
+.relation .avatar{width:115px;background:#fff1f5;border-radius:17px}
+.relation p{color:#716578;font-size:14px;margin-top:5px}
+.album{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.memory{background:linear-gradient(145deg,#fffdfc,#fff1f5);border:1px solid #f0dce8;border-radius:18px;padding:22px;min-height:155px}
+.memory.locked{background:#f9f6f9;color:#8d8391;border-style:dashed}
+.memory b{display:block;font-size:18px;margin:6px 0}
+.memory .symbol{font-size:30px}
+.notice{padding:13px 16px;background:#fff0f5;border-radius:14px;color:#855269;font-size:13px}
+.foot{margin-top:28px;text-align:center;color:#948794;font-size:12px}
+.story-app{min-height:100svh;max-width:1080px;margin:auto;padding:20px}
+.story-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.story-scene{border-radius:28px;overflow:hidden;border:1px solid #eadce5;position:relative;min-height:390px;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(145deg,var(--scene-bg,#ffe5de),#fff9f4);box-shadow:var(--shadow)}
+.story-scene:after{content:"";position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(transparent,#4d304d22);pointer-events:none}
+.scenery{position:absolute;inset:0;overflow:hidden}
+.scenery:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;top:-120px;right:5%;background:#fff9e5aa}
+.scenery:after{content:"";position:absolute;width:100%;height:15%;left:0;bottom:0;background:#997d8766}
+.scenery-label{position:absolute;left:24px;top:22px;color:#655060;font-size:14px;letter-spacing:1px;font-weight:900;background:#ffffffa8;padding:7px 13px;border-radius:30px}
+.scenery-decoration{position:absolute;left:9%;top:25%;font-size:78px;opacity:.65}
+.story-scene .avatar{width:min(360px,62vw);position:relative;z-index:2;transform:translateY(37px);filter:drop-shadow(0 12px 0 #ad738a16)}
+.story-box{background:#fff;border:1px solid #ecdce4;border-radius:25px;padding:25px 28px;box-shadow:var(--shadow);margin-top:-13px;position:relative;z-index:3}
+.story-box .speaker{color:#ae5c89;font-size:13px;font-weight:900;letter-spacing:.5px}
+.story-box .line{font-size:clamp(18px,2.8vw,22px);line-height:1.65;min-height:66px;margin:8px 0 18px;word-break:keep-all}
+.story-choices{display:grid;gap:10px;margin-top:10px}
+.choice{display:block;width:100%;text-align:left;border:1px solid #efdfe8;border-radius:14px;background:#fff6fa;color:#524253;padding:14px 16px;font-weight:800;min-height:52px}
+.choice:hover{background:#fceaf3}
+.story-controls{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+.result-heart{font-size:29px;color:#d96291;font-weight:900}
+.progress{height:6px;background:#f4e9ef;border-radius:99px;overflow:hidden;margin-bottom:19px}
+.progress span{display:block;height:100%;background:#db7fa7;transition:width .2s}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);max-width:90vw;background:#443548;color:#fff;border-radius:15px;padding:13px 20px;z-index:10;text-align:center;box-shadow:0 7px 22px #44354840;font-size:14px}
+[hidden]{display:none!important}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1fr .55fr;gap:0}}
+@media(max-width:650px){.wrap{padding:14px 14px 38px}.top{margin-bottom:17px}.brand{font-size:21px}.hero{padding:24px 22px;grid-template-columns:1fr}.hero-art{min-height:155px}.hero-art .avatar{width:155px}.hero-art:before{width:150px;height:150px}.grid{gap:10px}.npc{padding:12px;border-radius:18px}.npc .portrait-box{min-height:130px;margin:6px 0 12px}.npc .avatar{width:130px}.npc .name{font-size:18px}.npc .quote{min-height:90px}.npc .job{font-size:11px}.npc .btn{padding:10px 8px;font-size:12px}.panel{padding:16px}.album{grid-template-columns:1fr}.story-app{padding:12px}.story-scene{min-height:320px}.story-box{padding:21px 18px}.relation{grid-template-columns:90px 1fr;gap:12px}.relation .avatar{width:90px}.scenery-decoration{left:5%;font-size:54px}.hero h1{font-size:32px}}
+@media(max-width:380px){.npc .portrait-box{min-height:115px}.npc .avatar{width:115px}.npc .quote{font-size:12px;min-height:100px}.npc{padding:10px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script>
+'use strict';
+const KEY='geobong-romance-v1', ALBUM_KEY='geobong-romance-endings-v1';
+const CAST=[
+{id:'momo',name:'모모',species:1,look:1,mood:1,job:'느린 커피 · 바리스타',tag:'다정한 낙관주의자',quote:'“이런 날은 누군가와 커피를 마시고 싶어.”',bg:'#ffe9d9',accent:'#eaa58f',place:'느린 커피',decoration:'☕',ending:'함께 맞이하는 아침',endingText:'사소한 하루가 특별해지는 두 사람의 아침.'},
+{id:'rui',name:'루이',species:2,look:0,mood:0,job:'골목 책방 · 책방지기',tag:'무심한 듯 섬세한',quote:'“좋아하는 결말이 꼭 행복할 필요는 없지.”',bg:'#e7e4f5',accent:'#9b8ec7',place:'골목 책방',decoration:'📚',ending:'책갈피에 남긴 이름',endingText:'같은 페이지를 천천히 넘기는 오래된 약속.'},
+{id:'sion',name:'시온',species:5,look:0,mood:1,job:'옥상 정원 · 사진가',tag:'장난기 많은 자유인',quote:'“지금 이 순간, 사진으로 남겨도 될까?”',bg:'#e2eaf7',accent:'#91adce',place:'옥상 정원',decoration:'📷',ending:'별보다 가까운 사이',endingText:'가장 선명한 풍경은 언제나 서로의 곁에.'},
+{id:'doha',name:'도하',species:3,look:1,mood:0,job:'작은 우체국 · 배달원',tag:'말보다 행동이 먼저',quote:'“방향을 몰라도 괜찮아. 같이 찾으면 되니까.”',bg:'#e3f2e5',accent:'#89bd9a',place:'작은 우체국',decoration:'✉️',ending:'너에게 닿는 길',endingText:'돌고 돌아도 결국 같은 집으로 향하는 마음.'}
+];
+const STORIES={
+momo:[
+{title:'첫 잔의 온도',place:'느린 커피',decoration:'☕',lines:[['나레이션','빗방울이 시작된 오후. 작은 카페에 마지막 자리가 남아 있다.'],['모모','어서 와! 오늘 메뉴는 조금 특별해. 내가 방금 만든 거거든.'],['모모','혹시 첫 손님이 되어 줄래?']],choices:[['“좋아. 어떤 맛인지 궁금해.”',2,'모모는 환하게 웃으며 가장 예쁜 컵을 꺼냈다.'],['“같이 마시면 좋겠어.”',2,'모모가 두 잔을 나란히 놓았다.'],['“다음에 올게.”',0,'모모는 고개를 끄덕였다. “언제든 기다릴게.”']]},
+{title:'오래 머무는 손님',place:'느린 커피',decoration:'🥐',lines:[['나레이션','마감 직전, 카페에는 조용한 음악이 흐른다.'],['모모','너만 오면 시간이 조금 느리게 가는 것 같아.'],['모모','오늘도 좀 더 있다 갈래?']],choices:[['“마감 정리 도와줄게.”',2,'함께 의자를 올려놓으며 어깨가 스쳤다.'],['“네 얘기 더 듣고 싶어.”',2,'모모는 잠시 망설이다 오늘 있었던 일을 들려주었다.'],['“많이 피곤해 보여.”',1,'모모는 따뜻한 미소로 고마움을 전했다.']]},
+{title:'비 오는 날의 약속',place:'골목 버스 정류장',decoration:'☂️',lines:[['나레이션','갑작스러운 소나기. 모모는 우산 하나를 들고 서 있다.'],['모모','아, 너다! 우산 하나인데… 어떻게 할까?'],['나레이션','잠시 말이 없자, 모모가 우산을 조금 더 네 쪽으로 기울인다.']],choices:[['“가까이 걷자. 안 젖게.”',2,'모모가 살짝 얼굴을 붉힌다. 우산 아래 거리가 좁아졌다.'],['“내가 우산 들어 줄게.”',2,'모모는 네 손과 우산을 번갈아 보다가 웃었다.'],['“먼저 가. 나는 괜찮아.”',0,'모모는 끝까지 걱정스러운 눈빛이었다.']]}
+],
+rui:[
+{title:'첫 문장',place:'골목 책방',decoration:'📚',lines:[['나레이션','낡은 책방 문을 열자 종소리가 울린다.'],['루이','조용히. 여기는 책이 사람보다 말이 많은 곳이거든.'],['루이','어떤 이야기를 찾고 있어?']],choices:[['“네가 좋아하는 책을 추천해 줘.”',2,'루이는 표지 한 귀퉁이를 조심히 쓸며 책을 건넨다.'],['“끝이 정해지지 않은 이야기.”',2,'루이의 눈빛이 조금 달라졌다. “나도 그런 게 좋아.”'],['“그냥 구경만 할게.”',0,'“그래.” 루이는 책장을 다시 펼쳤다.']]},
+{title:'밑줄 친 마음',place:'골목 책방',decoration:'📖',lines:[['나레이션','빌린 책 사이에서 짧은 메모가 발견됐다.'],['루이','그 문장, 네 생각이 났어.'],['루이','…아무 뜻 없다는 건 거짓말이겠지.']],choices:[['“그 페이지, 나도 몇 번 읽었어.”',2,'루이는 고개를 숙였지만 입꼬리는 숨기지 못했다.'],['“다음엔 네가 읽어 줘.”',2,'“그럼 조용한 저녁에.” 루이가 약속했다.'],['“메모는 돌려줄게.”',0,'루이는 메모를 접어 주머니에 넣었다.']]},
+{title:'마지막 페이지 앞에서',place:'골목 책방',decoration:'🕯️',lines:[['나레이션','닫을 시간이 지났는데도 루이는 불을 끄지 않는다.'],['루이','이 소설은 마지막 장이 비어 있어.'],['루이','우리라면 어떤 결말을 쓸 것 같아?']],choices:[['“아직 끝내지 말자. 오래 읽고 싶어.”',2,'루이는 책을 덮지 않고 네 옆에 앉았다.'],['“두 사람이 같은 페이지에 있는 결말.”',2,'“그거, 꽤 마음에 들어.” 목소리가 조금 떨렸다.'],['“결말은 혼자 정해야지.”',0,'루이는 빈 페이지를 조용히 바라봤다.']]}
+],
+sion:[
+{title:'흔들린 사진',place:'옥상 정원',decoration:'📷',lines:[['나레이션','옥상 정원에서 카메라 셔터 소리가 들린다.'],['시온','앗, 방금 네가 프레임 안으로 들어왔어.'],['시온','삭제할까, 아니면 같이 볼래?']],choices:[['“같이 보자. 어떻게 나왔어?”',2,'시온은 네 표정을 살피며 화면을 가까이 가져왔다.'],['“다음엔 같이 찍자.”',2,'“좋아! 약속했다?” 시온이 신나게 웃는다.'],['“지워 줘.”',1,'“당연하지.” 시온은 사진을 곧바로 삭제했다.']]},
+{title:'해 질 무렵',place:'옥상 정원',decoration:'🌇',lines:[['나레이션','두 사람은 해가 지는 옥상 난간 옆에 앉아 있다.'],['시온','매일 같은 하늘인데 이상하게 오늘은 좀 다르다.'],['시온','너는 어떤 순간을 남기고 싶어?']],choices:[['“지금처럼 네가 웃는 순간.”',2,'셔터를 누르려던 시온이 한동안 말을 잊는다.'],['“우리 둘이 함께 있는 풍경.”',2,'시온은 삼각대를 꺼내 나란히 선 사진을 남겼다.'],['“하늘만 찍자.”',1,'시온은 멋진 노을을 찍고 네게 사진을 보내 주었다.']]},
+{title:'흐릿해도 좋은 장면',place:'별이 뜬 옥상',decoration:'✨',lines:[['나레이션','바람이 센 밤. 시온의 사진이 조금 흔들렸다.'],['시온','실패작이네. 그런데 이상하게 지우기는 싫어.'],['시온','너는 어때? 완벽하지 않아도 괜찮아?']],choices:[['“불완전해서 더 좋아. 우리처럼.”',2,'시온은 사진보다 오래 네 얼굴을 바라봤다.'],['“내 옆에 있으면 다시 찍어도 돼.”',2,'“그럼 아주 많이 찍어야겠네.”'],['“잘 나온 사진으로 바꾸자.”',0,'시온이 카메라 화면을 다시 켰다.']]}
+],
+doha:[
+{title:'잘못 배달된 편지',place:'작은 우체국',decoration:'✉️',lines:[['나레이션','우체국 앞, 주소가 번진 봉투 한 장이 바람에 날린다.'],['도하','혹시 이 주소 읽을 수 있어? 나 혼자서는 못 찾겠어.'],['도하','같이 찾아볼래?']],choices:[['“골목 끝까지 함께 가 보자.”',2,'도하는 네 걸음에 맞춰 속도를 늦췄다.'],['“우선 힌트부터 찾아보자.”',2,'도하가 고개를 끄덕이며 봉투를 조심히 펼쳤다.'],['“바쁘니까 다음에.”',0,'도하는 혼자 골목 지도를 펼쳤다.']]},
+{title:'돌아오는 길',place:'저녁 골목',decoration:'🚲',lines:[['나레이션','배달이 끝난 저녁, 도하가 자전거를 끌고 걷는다.'],['도하','늘 누군가에게 무언가를 전하는데…'],['도하','정작 내 마음은 어디로 보내야 할지 모르겠어.']],choices:[['“직접 말해도 괜찮아. 내가 들을게.”',2,'도하는 잠시 멈춰 너를 향해 몸을 돌렸다.'],['“길을 같이 찾으면 되지.”',2,'“그 말, 오래 기억할게.” 도하가 웃었다.'],['“언젠가 알게 되겠지.”',1,'도하는 조금 안심한 듯 고개를 끄덕였다.']]},
+{title:'수신인 미상',place:'작은 우체국',decoration:'💌',lines:[['나레이션','도하는 우체통을 닫지 못하고 망설이고 있다.'],['도하','처음으로 내가 쓴 편지야. 받는 사람 이름은 적었는데…'],['도하','건네줄 용기가 안 나네.']],choices:[['“말로 전해도 돼. 여기 있을게.”',2,'도하의 손에서 편지가 천천히 내려왔다.'],['“함께 보내러 가자.”',2,'도하는 네 쪽으로 한 걸음 다가왔다.'],['“우체통에 넣으면 되지.”',0,'도하는 봉투를 쥔 채 한참 서 있었다.']]}
+]
+};
+let state, gallery, page='home', scene=null, step=0, result=null;
+function $ (selector){return document.querySelector(selector)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function newState(){return {day:1,energy:2,aff:{},stage:{},last:{},partner:null,history:[]}}
+function load(){
+try{state=JSON.parse(localStorage.getItem(KEY))||newState()}catch(e){state=newState()}
+if(!state||typeof state!=='object')state=newState();
+state.aff=state.aff&&typeof state.aff==='object'?state.aff:{};
+state.stage=state.stage&&typeof state.stage==='object'?state.stage:{};
+state.last=state.last&&typeof state.last==='object'?state.last:{};
+state.history=Array.isArray(state.history)?state.history:[];
+state.day=Math.max(1,Number(state.day)||1);
+state.energy=Math.max(0,Math.min(2,Number.isFinite(Number(state.energy))?Number(state.energy):2));
+if(!CAST.some(c=>c.id===state.partner))state.partner=null;
+try{gallery=JSON.parse(localStorage.getItem(ALBUM_KEY))||{}}catch(e){gallery={}}
+if(!gallery||typeof gallery!=='object')gallery={};
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){toast('저장 공간이 부족해 진행 상황을 저장하지 못했어요.')}}
+function saveGallery(){try{localStorage.setItem(ALBUM_KEY,JSON.stringify(gallery))}catch(e){toast('엔딩 앨범을 저장하지 못했어요.')}}
+function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.hidden=true,2900)}
+function cast(id){return CAST.find(c=>c.id===id)}
+function affection(id){return Math.max(0,Math.min(10,Number(state.aff[id])||0))}
+function chapter(id){return Math.max(0,Math.min(3,Number(state.stage[id])||0))}
+function portrait(c,size){const m=c.mood||0,v=c.look||0,i=c.species||0,ys=[0,324,612],hs=[324,288,275],h=hs[m];
+return '<div class="avatar '+(size||'')+'" role="img" aria-label="'+esc(c.name||'나')+' 캐릭터"><span class="sprite" style="aspect-ratio:295.6667/'+h+';background-image:url(./assets/animals-looks-v2-'+v+'.webp);background-size:600% '+(887/h*100)+'%;background-position:'+(i*20)+'% '+(ys[m]/(887-h)*100)+'%"></span></div>'}
+function player(){
+try{const v=JSON.parse(localStorage.getItem('moadong-v1'));if(v&&v.char&&Number.isInteger(v.char.species)&&v.char.species>=0&&v.char.species<=5)return {name:'나',species:v.char.species,look:Math.min(2,Math.max(0,v.char.look||0)),mood:Math.min(2,Math.max(0,v.char.mood||0))}}catch(e){}
+return {name:'나',species:0,look:0,mood:1};
+}
+function level(id){const n=chapter(id),a=affection(id);if(state.partner===id)return '연인';if(n===0)return '처음 만날 사이';if(n===1)return '서로 알아가는 중';if(n===2)return '조금 가까운 사이';if(n===3&&a<5)return '마음을 더 알아가는 중';return '고백을 기다리는 사이'}
+function hearts(id){const n=affection(id);let h='<div class="aff" aria-label="호감도 '+n+' / 10">';for(let i=0;i<10;i++)h+='<i class="'+(i<n?'on':'')+'"></i>';return h+'</div><div class="aff-text">♥ '+n+' / 10 · '+level(id)+'</div>'}
+function mainShell(inner){
+$('#app').innerHTML='<div class="wrap"><header class="top"><div class="brand">거봉동네<small>우연이 사랑이 될 때</small></div><div class="row"><span class="stat">DAY '+state.day+'</span><span class="stat">오늘의 만남 '+state.energy+' / 2</span><a class="link" href="./index.html">생활 모드로 돌아가기</a></div></header><nav class="menu" aria-label="연애 모드 메뉴">'+[['home','골목 산책'],['relations','인연 노트'],['album','추억 앨범']].map(function(t){return '<button class="btn '+(page===t[0]?'active':'')+'" onclick="showPage(\''+t[0]+'\')">'+t[1]+'</button>'}).join('')+'</nav>'+inner+'<div class="foot">기존 생활 모드와 별도로 자동 저장됩니다 · 캐릭터 모습은 생활 모드에서 가져옵니다.</div></div>';
+}
+function showPage(p){scene=null;page=p;render()}
+function render(){
+if(!state){load()}
+if(page==='relations')return renderRelations();
+if(page==='album')return renderAlbum();
+let progress=CAST.reduce((n,c)=>n+chapter(c.id),0);
+let hero='<section class="hero"><div><span class="pill">거봉동네 연애 시뮬레이션</span><h1>오늘, 누군가를<br>좋아하게 될지도 몰라.</h1><p class="desc">같은 골목에서 네 사람과 우연히 마주칩니다. 어떤 말을 건넬지, 누구와 시간을 보낼지 모두 당신의 선택이에요.</p><div class="actions"><span class="stat">기억한 장면 '+progress+' / 12</span><span class="stat">발견한 연애 엔딩 '+Object.keys(gallery).filter(k=>gallery[k]).length+' / 4</span></div></div><div class="hero-art">'+portrait(player())+'</div></section>';
+let cards=CAST.map(function(c){let done=state.last[c.id]===state.day;return '<article class="npc" style="--accent:'+c.accent+';--bg:'+c.bg+'"><div class="pill">'+c.tag+'</div><div class="portrait-box">'+portrait(c)+'</div><div class="name">'+c.name+'</div><div class="job">'+c.job+'</div><p class="quote">'+esc(c.quote)+'</p>'+hearts(c.id)+'<button class="btn '+(state.partner===c.id?'primary':'')+'" onclick="meet(\''+c.id+'\')" '+(done||!state.energy?'disabled':'')+'>'+(state.partner===c.id?'연인과 데이트':done?'오늘은 이미 만났어요':chapter(c.id)===0?'첫 만남':chapter(c.id)===3&&affection(c.id)>=5&&state.day>=4&&!state.partner?'마음을 전하기':'만나러 가기')+'</button></article>'}).join('');
+let partner=state.partner?cast(state.partner):null;
+mainShell(hero+'<div class="section-header"><div><h2>누구를 만나러 갈까?</h2><p>하루에 두 번 만날 수 있어요. 같은 주민은 하루에 한 번만.</p></div></div><div class="grid">'+cards+'</div><div class="section-header"><div><h2>오늘의 기록</h2><p>'+(partner?partner.name+'와(과) 연인이 되었어요.':'마음이 닿는 방향을 천천히 찾아보세요.')+'</p></div></div><div class="panel"><div class="row" style="justify-content:space-between;align-items:center"><p class="sub">'+(state.energy?'아직 '+state.energy+'번의 만남이 남았어요.':'오늘의 만남을 모두 마쳤어요. 다음 날로 넘어갈까요?')+'</p><button class="btn primary" onclick="sleepDay()">밤이 지나고 · 다음 날</button></div></div>');
+}
+function renderRelations(){
+mainShell('<section class="panel"><h1>인연 노트</h1><p class="sub" style="margin:6px 0 17px">마주친 순간과 대화의 선택이 호감도를 바꿉니다.</p>'+CAST.map(function(c){
+return '<div class="relation">'+portrait(c)+'<div><h3>'+c.name+' · '+level(c.id)+'</h3><p>'+c.tag+' · 이야기 '+chapter(c.id)+' / 3</p>'+hearts(c.id)+'<p>'+esc(c.quote)+'</p></div></div>'
+}).join('')+'</section><div class="section-header"><h2>사소한 순간들</h2></div><section class="panel">'+(state.history.length?state.history.slice(0,22).map(function(h){const c=cast(h.id);return '<p class="sub" style="padding:10px 0;border-bottom:1px solid #f1e6ed"><b>DAY '+h.day+' · '+esc(c?c.name:'동네')+'</b> — '+esc(h.title)+'<br>'+esc(h.text)+'</p>'}).join(''):'<p class="sub">아직 남겨진 추억이 없어요. 골목에서 누군가를 만나 보세요.</p>')+'</section>');
+}
+function renderAlbum(){
+let unlocked=CAST.filter(c=>gallery[c.id]).length;
+mainShell('<section class="hero"><div><span class="pill">ENDING COLLECTION</span><h1>우리가 함께 만든<br>서로 다른 결말.</h1><p class="desc">엔딩을 보고 새롭게 시작해도 이 앨범은 남아요. 네 사람의 마지막 페이지를 모두 모아 보세요.</p><div class="actions"><span class="stat">완성 '+unlocked+' / 4</span></div></div><div class="hero-art">'+portrait(player())+'</div></section><div class="section-header"><h2>엔딩 앨범</h2></div><div class="album">'+CAST.map(function(c){let done=!!gallery[c.id];return '<article class="memory '+(done?'':'locked')+'"><span class="symbol">'+(done?'♥':'♡')+'</span><div class="pill">'+c.name+' ROUTE</div><b>'+(done?c.ending:'아직 쓰이지 않은 이야기')+'</b><p class="sub">'+(done?c.endingText:'이 인연의 끝에 어떤 이야기가 기다릴까요?')+'</p></article>'}).join('')+'</div><div class="section-header"><h2>다시 시작하기</h2></div><div class="panel"><p class="sub">현재 연애 진행 상황만 처음으로 되돌립니다. 생활 모드의 캐릭터·집·재화와 수집한 엔딩 앨범은 그대로 유지돼요.</p><div class="actions"><button class="btn ghost" onclick="resetRomance()">새로운 연애 시작하기</button></div></div>');
+}
+function sleepDay(){state.day++;state.energy=2;save();render();toast('새로운 하루가 시작됐어요. 오늘도 좋은 만남이 있길!')}
+function resetRomance(){if(!confirm('연애 진행 상황을 새로 시작할까요? 수집한 엔딩 앨범과 생활 모드 저장은 유지됩니다.'))return;state=newState();save();page='home';render();toast('새로운 이야기가 시작됐어요.')}
+function meet(id){
+const c=cast(id);if(!c)return;
+if(!state.energy){toast('오늘의 만남은 끝났어요. 다음 날을 시작해 주세요.');return}
+if(state.last[id]===state.day){toast('오늘은 이미 만났어요. 다음 날 또 만나요.');return}
+const st=chapter(id), a=affection(id);
+let type='event';
+if(state.partner===id)type='date';
+else if(st===3)type=state.partner?'friend':a>=5&&state.day>=4?'confession':'talk';
+let data;
+if(type==='event')data=STORIES[id][st];
+if(type==='talk')data={title:'조금 더 가까이',place:c.place,decoration:c.decoration,lines:[['나레이션',c.place+'에서 '+c.name+'와(과) 잠시 이야기를 나눈다.'],[c.name,'사소한 얘기도 네게 들려주면 조금 특별해져.'],[c.name,'다음에도 이렇게 이야기하자.']],choices:[['“응. 네 이야기가 궁금해.”',2,'서로의 작은 하루를 나누는 시간이 길어졌다.'],['“오늘 만나서 반가웠어.”',1,'따뜻한 인사를 나누었다.'],['“나중에 보자.”',0,'다음 만남을 기약했다.']]};
+if(type==='friend')data={title:'오래된 친구',place:c.place,decoration:c.decoration,lines:[['나레이션','서로 다른 마음도 시간이 지나면 소중한 우정이 된다.'],[c.name,'다음에도 이 골목에서 웃으며 인사하자.']],choices:[['“우리 오래 친구하자.”',1,'두 사람은 편안하게 웃었다.'],['“오늘도 즐거웠어.”',1,'소중한 우정이 하나 더 쌓였다.']]};
+if(type==='date')data={title:'평범해서 특별한 데이트',place:c.place,decoration:'💗',lines:[['나레이션',c.name+'와(과) 아무 계획 없이 골목을 걷는다.'],[c.name,'네가 있으니까 오늘은 그냥 걷는 것도 좋다.'],[c.name,'조금만 더 같이 있을래?']],choices:[['“손잡고 한 바퀴 더 걷자.”',2,'꼭 잡은 손이 오래도록 따뜻했다.'],['“다음 데이트는 내가 계획할게.”',2,'다음 약속이 하나 더 생겼다.'],['“집까지 함께 가자.”',1,'두 사람은 천천히 집으로 향했다.']]};
+if(type==='confession')data={title:'마음을 전하는 밤',place:c.place,decoration:'💌',lines:[['나레이션','저녁 바람이 불어오는 골목. 한참 망설이던 '+c.name+'가(이) 입을 연다.'],[c.name,'너와 있으면 별일 없는 하루도 기다려져.'],[c.name,'이제는 친구라는 말로는 다 설명할 수 없을 것 같아.'],[c.name,'…나와 같은 마음이야?']],choices:[['“나도 너를 좋아해.”',2,'두 사람의 작은 이야기가 연애라는 이름을 얻었다.'],['“조금 더 천천히 알아가고 싶어.”',1,'“응. 기다릴 수 있어.” '+c.name+'가(이) 웃었다.']]};
+scene={id,type,data};step=0;result=null;renderScene();
+}
+function renderScene(){
+const c=cast(scene.id), data=scene.data, done=step>=data.lines.length;
+let line=done?null:data.lines[step];
+let body='<div class="story-app"><div class="story-top"><div class="brand">거봉동네<small>'+esc(data.title)+' · DAY '+state.day+'</small></div><button class="btn ghost" onclick="leaveScene()">돌아가기</button></div><div class="progress" aria-hidden="true"><span style="width:'+((step+1)/(data.lines.length+1)*100)+'%"></span></div><div class="story-scene" style="--scene-bg:'+c.bg+'"><div class="scenery"><span class="scenery-label">'+esc(data.place)+'</span><span class="scenery-decoration">'+esc(data.decoration)+'</span></div>'+portrait(c)+'</div><section class="story-box" aria-live="polite">';
+if(result){
+body+='<div class="speaker">'+c.name+' · '+esc(data.title)+'</div><p class="line">'+esc(result.text)+'</p><p class="result-heart">'+(result.score?'♥ +'+result.score:'♥ 마음의 거리 그대로')+'</p>'+(result.ending?'<h2 style="margin:10px 0">ENDING · '+esc(c.ending)+'</h2><p class="sub">'+esc(c.endingText)+'</p>':'')+'<div class="story-controls"><button class="btn primary" onclick="leaveScene()">동네로 돌아가기</button></div>';
+}else if(!done){
+body+='<div class="speaker">'+esc(line[0])+'</div><p class="line">'+esc(line[1])+'</p><div class="story-controls"><button class="btn primary" onclick="nextLine()">다음 이야기 →</button></div>';
+}else{
+body+='<div class="speaker">당신의 선택</div><p class="line">'+esc(c.name)+'에게 어떤 말을 전할까요?</p><div class="story-choices">'+data.choices.map(function(choice,i){return '<button class="choice" onclick="chooseAnswer('+i+')">'+(i+1)+'. '+esc(choice[0])+'</button>'}).join('')+'</div>';
+}
+$('#app').innerHTML=body+'</section><div class="foot">1 · 2 · 3 키로 선택 · Enter 키로 대사 넘기기</div></div>';
+}
+function nextLine(){if(!scene||result)return;step=Math.min(scene.data.lines.length,step+1);renderScene()}
+function chooseAnswer(i){
+if(!scene||result||step<scene.data.lines.length)return;
+let d=scene.data,ch=d.choices[i];if(!ch)return;
+const id=scene.id,c=cast(id),type=scene.type,score=ch[1];const earned=!!(type==='confession'&&i===0&&!state.partner);
+state.energy=Math.max(0,state.energy-1);
+state.aff[id]=Math.min(10,affection(id)+score);
+state.last[id]=state.day;
+if(type==='event')state.stage[id]=Math.min(3,chapter(id)+1);
+if(earned){state.partner=id;gallery[id]=true;saveGallery()}
+state.history.unshift({id,day:state.day,title:earned?'ENDING · '+c.ending:d.title,text:ch[2]});
+state.history=state.history.slice(0,70);
+save();result={score:score,text:ch[2],ending:earned};renderScene();
+}
+function leaveScene(){scene=null;result=null;page='home';render()}
+document.addEventListener('keydown',function(e){
+if(!scene||e.repeat||e.altKey||e.ctrlKey||e.metaKey||['INPUT','TEXTAREA','SELECT','BUTTON','A'].includes(document.activeElement.tagName))return;
+if(e.key==='Enter'&&!result&&step<scene.data.lines.length){e.preventDefault();nextLine();return}
+if(!result&&step>=scene.data.lines.length&&/^[1-3]$/.test(e.key)){e.preventDefault();chooseAnswer(Number(e.key)-1)}
+});
+load();render();
+</script>
+</body></html>
