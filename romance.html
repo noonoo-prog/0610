@@ -206,8 +206,8 @@ let data;
 if(type==='event')data=storyAt(id,st);
 if(type==='talk')data={title:'조금 더 가까이',place:c.place,decoration:c.decoration,lines:[['나레이션',c.place+'에서 '+c.name+'와(과) 잠시 이야기를 나눈다.'],[c.name,'사소한 얘기도 네게 들려주면 조금 특별해져.'],[c.name,'다음에도 이렇게 이야기하자.']],choices:[['“응. 네 이야기가 궁금해.”',2,'서로의 작은 하루를 나누는 시간이 길어졌다.'],['“오늘 만나서 반가웠어.”',1,'따뜻한 인사를 나누었다.'],['“나중에 보자.”',0,'다음 만남을 기약했다.']]};
 if(type==='friend')data={title:'오래된 친구',place:c.place,decoration:c.decoration,lines:[['나레이션','서로 다른 마음도 시간이 지나면 소중한 우정이 된다.'],[c.name,'다음에도 이 골목에서 웃으며 인사하자.']],choices:[['“우리 오래 친구하자.”',1,'두 사람은 편안하게 웃었다.'],['“오늘도 즐거웠어.”',1,'소중한 우정이 하나 더 쌓였다.']]};
-if(type==='date')data={title:'평범해서 특별한 데이트',place:c.place,decoration:'💗',lines:[['나레이션',c.name+'와(과) 아무 계획 없이 골목을 걷는다.'],[c.name,'네가 있으니까 오늘은 그냥 걷는 것도 좋다.'],[c.name,'조금만 더 같이 있을래?']],choices:[['“손잡고 한 바퀴 더 걷자.”',2,'꼭 잡은 손이 오래도록 따뜻했다.'],['“다음 데이트는 내가 계획할게.”',2,'다음 약속이 하나 더 생겼다.'],['“집까지 함께 가자.”',1,'두 사람은 천천히 집으로 향했다.']]};
-if(type==='confession')data={title:'마음을 전하는 밤',place:c.place,decoration:'💌',lines:[['나레이션','저녁 바람이 불어오는 골목. 한참 망설이던 '+c.name+'가(이) 입을 연다.'],[c.name,'너와 있으면 별일 없는 하루도 기다려져.'],[c.name,'이제는 친구라는 말로는 다 설명할 수 없을 것 같아.'],[c.name,'…나와 같은 마음이야?']],choices:[['“나도 너를 좋아해.”',2,'두 사람의 작은 이야기가 연애라는 이름을 얻었다.'],['“조금 더 천천히 알아가고 싶어.”',1,'“응. 기다릴 수 있어.” '+c.name+'가(이) 웃었다.']]};
+if(type==='date')data=dateFor(id);
+if(type==='confession')data=confessionFor(id);
 scene={id,type,data};step=0;result=null;renderScene();
 }
 function renderScene(){
