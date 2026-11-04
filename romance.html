@@ -140,7 +140,7 @@ doha:[
 let state, gallery, page='home', scene=null, step=0, result=null;
 function $ (selector){return document.querySelector(selector)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function newState(){return {day:1,energy:2,aff:{},stage:{},last:{},choices:{},partner:null,history:[]}}
+function newState(){return {day:1,energy:2,aff:{},stage:{},last:{},choices:{},secretSeen:[],partner:null,history:[]}}
 function load(){
 try{state=JSON.parse(localStorage.getItem(KEY))||newState()}catch(e){state=newState()}
 if(!state||typeof state!=='object')state=newState();
@@ -148,6 +148,7 @@ state.aff=state.aff&&typeof state.aff==='object'?state.aff:{};
 state.stage=state.stage&&typeof state.stage==='object'?state.stage:{};
 state.last=state.last&&typeof state.last==='object'?state.last:{};
 state.choices=state.choices&&typeof state.choices==='object'?state.choices:{};
+state.secretSeen=Array.isArray(state.secretSeen)?state.secretSeen:[];
 state.history=Array.isArray(state.history)?state.history:[];
 state.day=Math.max(1,Number(state.day)||1);
 state.energy=Math.max(0,Math.min(2,Number.isFinite(Number(state.energy))?Number(state.energy):2));
@@ -179,7 +180,7 @@ if(page==='relations')return renderRelations();
 if(page==='album')return renderAlbum();
 let progress=CAST.reduce((n,c)=>n+chapter(c.id),0);
 let hero='<section class="hero"><div><span class="pill">거봉동네 연애 시뮬레이션</span><h1>오늘, 누군가를<br>좋아하게 될지도 몰라.</h1><p class="desc">같은 골목에서 네 사람과 우연히 마주칩니다. 어떤 말을 건넬지, 누구와 시간을 보낼지 모두 당신의 선택이에요.</p><div class="actions"><span class="stat">기억한 장면 '+progress+' / '+CAST.reduce((n,c)=>n+STORIES[c.id].length,0)+'</span><span class="stat">발견한 연애 엔딩 '+Object.keys(gallery).filter(k=>gallery[k]).length+' / 4</span></div></div><div class="hero-art">'+portrait(player())+'</div></section>';
-let cards=CAST.map(function(c){let done=state.last[c.id]===state.day;return '<article class="npc" style="--accent:'+c.accent+';--bg:'+c.bg+'"><div class="pill">'+c.tag+'</div><div class="portrait-box">'+portrait(c)+'</div><div class="name">'+c.name+'</div><div class="job">'+c.job+'</div><p class="quote">'+esc(c.quote)+'</p>'+hearts(c.id)+'<button class="btn '+(state.partner===c.id?'primary':'')+'" onclick="meet(\''+c.id+'\')" '+(done||!state.energy?'disabled':'')+'>'+(state.partner===c.id?'연인과 데이트':done?'오늘은 이미 만났어요':chapter(c.id)===0?'첫 만남':chapter(c.id)>=STORIES[c.id].length&&affection(c.id)>=8&&state.day>=9&&!state.partner?'마음을 전하기':'만나러 가기')+'</button></article>'}).join('');
+let cards=CAST.map(function(c){let done=state.last[c.id]===state.day;return '<article class="npc" style="--accent:'+c.accent+';--bg:'+c.bg+'"><div class="pill">'+c.tag+'</div><div class="portrait-box">'+portrait(c)+'</div><div class="name">'+c.name+'</div><div class="job">'+c.job+'</div><p class="quote">'+esc(c.quote)+'</p>'+hearts(c.id)+'<button class="btn '+(state.partner===c.id?'primary':'')+'" onclick="meet(\''+c.id+'\')" '+(done||!state.energy?'disabled':'')+'>'+(state.partner===c.id?'연인과 데이트':done?'오늘은 이미 만났어요':chapter(c.id)===0?'첫 만남':chapter(c.id)>=STORIES[c.id].length&&affection(c.id)>=8&&state.day>=9&&!state.partner?'마음을 전하기':'만나러 가기')+'</button>'+secretButton(c,done)+'</article>'}).join('');
 let partner=state.partner?cast(state.partner):null;
 mainShell(hero+'<div class="section-header"><div><h2>누구를 만나러 갈까?</h2><p>하루에 두 번 만날 수 있어요. 같은 주민은 하루에 한 번만.</p></div></div><div class="grid">'+cards+'</div><div class="section-header"><div><h2>오늘의 기록</h2><p>'+(partner?partner.name+'와(과) 연인이 되었어요.':'마음이 닿는 방향을 천천히 찾아보세요.')+'</p></div></div><div class="panel"><div class="row" style="justify-content:space-between;align-items:center"><p class="sub">'+(state.energy?'아직 '+state.energy+'번의 만남이 남았어요.':'오늘의 만남을 모두 마쳤어요. 다음 날로 넘어갈까요?')+'</p><button class="btn primary" onclick="sleepDay()">밤이 지나고 · 다음 날</button></div></div>');
 }
@@ -188,10 +189,8 @@ mainShell('<section class="panel"><h1>인연 노트</h1><p class="sub" style="ma
 return '<div class="relation">'+portrait(c)+'<div><h3>'+c.name+' · '+level(c.id)+'</h3><p>'+c.tag+' · 이야기 '+chapter(c.id)+' / '+STORIES[c.id].length+'</p>'+hearts(c.id)+'<p>'+esc(c.quote)+'</p>'+secretStatus(c.id)+'</div></div>'
 }).join('')+'</section><div class="section-header"><h2>사소한 순간들</h2></div><section class="panel">'+(state.history.length?state.history.slice(0,22).map(function(h){const c=cast(h.id);return '<p class="sub" style="padding:10px 0;border-bottom:1px solid #f1e6ed"><b>DAY '+h.day+' · '+esc(c?c.name:'동네')+'</b> — '+esc(h.title)+'<br>'+esc(h.text)+'</p>'}).join(''):'<p class="sub">아직 남겨진 추억이 없어요. 골목에서 누군가를 만나 보세요.</p>')+'</section>');
 }
-function renderAlbum(){
-let unlocked=CAST.filter(c=>gallery[c.id]).length;
-mainShell('<section class="hero"><div><span class="pill">ENDING COLLECTION</span><h1>우리가 함께 만든<br>서로 다른 결말.</h1><p class="desc">엔딩을 보고 새롭게 시작해도 이 앨범은 남아요. 네 사람의 마지막 페이지를 모두 모아 보세요.</p><div class="actions"><span class="stat">완성 '+unlocked+' / 4</span></div></div><div class="hero-art">'+portrait(player())+'</div></section><div class="section-header"><h2>엔딩 앨범</h2></div><div class="album">'+CAST.map(function(c){let done=!!gallery[c.id];return '<article class="memory '+(done?'':'locked')+'"><span class="symbol">'+(done?'♥':'♡')+'</span><div class="pill">'+c.name+' ROUTE</div><b>'+(done?c.ending:'아직 쓰이지 않은 이야기')+'</b><p class="sub">'+(done?c.endingText:'이 인연의 끝에 어떤 이야기가 기다릴까요?')+'</p></article>'}).join('')+'</div><div class="section-header"><h2>다시 시작하기</h2></div><div class="panel"><p class="sub">현재 연애 진행 상황만 처음으로 되돌립니다. 생활 모드의 캐릭터·집·재화와 수집한 엔딩 앨범은 그대로 유지돼요.</p><div class="actions"><button class="btn ghost" onclick="resetRomance()">새로운 연애 시작하기</button></div></div>');
-}
+function renderAlbum(){renderSpecialAlbum()}
+
 function sleepDay(){state.day++;state.energy=2;save();render();toast('새로운 하루가 시작됐어요. 오늘도 좋은 만남이 있길!')}
 function resetRomance(){if(!confirm('연애 진행 상황을 새로 시작할까요? 수집한 엔딩 앨범과 생활 모드 저장은 유지됩니다.'))return;state=newState();save();page='home';render();toast('새로운 이야기가 시작됐어요.')}
 function meet(id){
@@ -208,12 +207,12 @@ if(type==='talk')data={title:'조금 더 가까이',place:c.place,decoration:c.d
 if(type==='friend')data={title:'오래된 친구',place:c.place,decoration:c.decoration,lines:[['나레이션','서로 다른 마음도 시간이 지나면 소중한 우정이 된다.'],[c.name,'다음에도 이 골목에서 웃으며 인사하자.']],choices:[['“우리 오래 친구하자.”',1,'두 사람은 편안하게 웃었다.'],['“오늘도 즐거웠어.”',1,'소중한 우정이 하나 더 쌓였다.']]};
 if(type==='date')data=dateFor(id);
 if(type==='confession')data=confessionFor(id);
-scene={id,type,data};step=0;result=null;renderScene();
+scene={id,type,data,cgId:(cgForEvent(id,type,st)||{}).id||null};step=0;result=null;renderScene();
 }
 function renderScene(){
 const c=cast(scene.id), data=scene.data, done=step>=data.lines.length;
 let line=done?null:data.lines[step];
-let body='<div class="story-app"><div class="story-top"><div class="brand">거봉동네<small>'+esc(data.title)+' · DAY '+state.day+'</small></div><button class="btn ghost" onclick="leaveScene()">돌아가기</button></div><div class="progress" aria-hidden="true"><span style="width:'+((step+1)/(data.lines.length+1)*100)+'%"></span></div><div class="story-scene" style="--scene-bg:'+c.bg+'"><div class="scenery"><span class="scenery-label">'+esc(data.place)+'</span><span class="scenery-decoration">'+esc(data.decoration)+'</span></div>'+portrait(c)+'</div><section class="story-box" aria-live="polite">';
+let body='<div class="story-app"><div class="story-top"><div class="brand">거봉동네<small>'+esc(data.title)+' · DAY '+state.day+'</small></div><button class="btn ghost" onclick="leaveScene()">돌아가기</button></div><div class="progress" aria-hidden="true"><span style="width:'+((step+1)/(data.lines.length+1)*100)+'%"></span></div><div class="story-scene" style="--scene-bg:'+c.bg+'">'+scenePicture(c,line)+'</div><section class="story-box" aria-live="polite">';
 if(result){
 body+='<div class="speaker">'+c.name+' · '+esc(data.title)+'</div><p class="line">'+esc(result.text)+'</p><p class="result-heart">'+(result.score?'♥ +'+result.score:'♥ 마음의 거리 그대로')+'</p>'+(result.ending?'<h2 style="margin:10px 0">ENDING · '+esc(c.ending)+'</h2><p class="sub">'+esc(c.endingText)+'</p>':'')+'<div class="story-controls"><button class="btn primary" onclick="leaveScene()">동네로 돌아가기</button></div>';
 }else if(!done){
@@ -232,7 +231,10 @@ state.energy=Math.max(0,state.energy-1);
 state.aff[id]=Math.min(10,affection(id)+score);
 state.last[id]=state.day;
 if(type==='event'){if(!Array.isArray(state.choices[id]))state.choices[id]=[];state.choices[id][chapter(id)]=i;state.stage[id]=Math.min(STORIES[id].length,chapter(id)+1)}
-if(earned){state.partner=id;gallery[id]=true;saveGallery()}
+if(type==='secret'&&scene.secretId&&!state.secretSeen.includes(scene.secretId)){state.secretSeen.push(scene.secretId);gallery.secrets[scene.secretId]=true}
+if(scene.cgId&&(type==='event'||type==='secret')){gallery.cgs[scene.cgId]=true}
+if(earned){state.partner=id;gallery[id]=true}
+if(type==='event'||type==='secret'||earned)saveGallery()
 state.history.unshift({id,day:state.day,title:earned?'ENDING · '+c.ending:d.title,text:ch[2]});
 state.history=state.history.slice(0,70);
 save();result={score:score,text:ch[2],ending:earned};renderScene();
@@ -246,4 +248,5 @@ if(!result&&step>=scene.data.lines.length&&/^[1-3]$/.test(e.key)){e.preventDefau
 load();
 </script>
 <script src="./romance-chapters.js"></script>
+<script src="./romance-special.js"></script>
 </body></html>
