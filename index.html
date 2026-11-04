@@ -86,7 +86,7 @@ function btn(t,action,cl=''){return '<button class="'+cl+'" onclick="'+action+'"
 function openModal(html){const m=$('#modal');m.className='';m.innerHTML=btn('×','closeModal()','close')+html;m.showModal()}
 function closeModal(){cancelReveal();if(game){toast('진행 중인 도전이 종료됩니다.');endGame(true);return}$('#modal').close();cancelAnimationFrame(anim)}
 $('#modal').addEventListener('cancel',e=>{e.preventDefault();closeModal()});
-function start(){if(s&&s.char){render();return}$('#app').innerHTML='<section class="intro"><h1>넌 선택받았다.</h1>'+btn('눈 뜨기','creation()')+'</section>'}
+function start(){if(s&&s.char){render();return}$('#app').innerHTML='<section class="intro"><h1>넌 선택받았다.</h1>'+btn('눈 뜨기','creation()')+btn('♥ 연애 시뮬 시작',"location.href='./romance.html'")+'</section>'}
 function creation(){qi=0;draft={species:0,mood:0,shirt:'#527eb9',...speciesCoats[0]};chooseSpecies()}
 
 function coatControls(c,existing){return '<div class="coat-controls"><h3>털색</h3><div class="coat-colors">'+furColors.map((f,i)=>'<button class="coat-choice" aria-pressed="'+(c.fur===i)+'" onclick="setCoat(\'fur\','+i+','+existing+')"><span class="coat-dot" style="--swatch:'+f[1]+'"></span>'+f[0]+'</button>').join('')+'</div><h3>무늬</h3><div class="coat-patterns">'+coatPatterns.map(p=>'<button class="coat-choice" aria-pressed="'+(coatFor(c).pattern===p[0])+'" onclick="setCoat(\'pattern\',\''+p[0]+'\','+existing+')">'+p[1]+'</button>').join('')+'</div></div>'}
