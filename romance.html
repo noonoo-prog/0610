@@ -164,6 +164,7 @@ function cast(id){return CAST.find(c=>c.id===id)}
 function affection(id){return Math.max(0,Math.min(10,Number(state.aff[id])||0))}
 function chapter(id){return Math.max(0,Math.min(STORIES[id].length,Number(state.stage[id])||0))}
 function portrait(c,size){if(c.cg)return '<img class="route-portrait" src="./assets/cg/'+c.cg+'.webp" alt="'+esc(c.fullName)+'">';
+if(c.id==='eden')return '<div class="avatar '+(size||'')+'" role="img" aria-label="차이든 금색 늑대"><span class="sprite" style="aspect-ratio:1;background-image:url(./assets/eden-gold-wolf.png);background-size:contain;background-position:center;background-repeat:no-repeat;image-rendering:pixelated"></span></div>';
 const m=c.mood||0,v=c.look||0,i=c.species||0,ys=[0,324,612],hs=[324,288,275],h=hs[m];
 return '<div class="avatar '+(size||'')+'" role="img" aria-label="'+esc(c.name||'나')+' 캐릭터"><span class="sprite" style="aspect-ratio:295.6667/'+h+';background-image:url(./assets/animals-looks-v2-'+v+'.webp);background-size:600% '+(887/h*100)+'%;background-position:'+(i*20)+'% '+(ys[m]/(887-h)*100)+'%"></span></div>'}
 function player(){
