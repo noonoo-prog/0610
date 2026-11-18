@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - "index.html"
+      - "romance.html"
+      - "romance-*.js"
+      - "assets/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
