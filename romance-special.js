@@ -19,7 +19,13 @@ CGS.push(
  {id:'eden_cake',who:'eden',chapter:2,title:'삼 일 늦은 생일'},
  {id:'haejun_empty',who:'haejun',chapter:3,title:'관객 없는 수요일'},
  {id:'eden_pizza',who:'eden',dateIndex:1,title:'오늘은 사장님도 앉아'},
- {id:'haejun_popcorn',who:'haejun',dateIndex:3,title:'팝콘 한 통이면 돼'}
+ {id:'haejun_popcorn',who:'haejun',dateIndex:3,title:'팝콘 한 통이면 돼'},
+ {id:'eden_birthday',who:'eden',chapter:1,title:'생일 주인공의 빈 의자'},
+ {id:'eden_breakfast',who:'eden',chapter:7,title:'귀걸이를 한 번에 고른 날'},
+ {id:'eden_billiards',who:'eden',dateIndex:3,title:'공 하나 남겨 둔 밤'},
+ {id:'haejun_foley',who:'haejun',chapter:2,title:'빗소리의 비밀'},
+ {id:'haejun_paused',who:'haejun',chapter:4,title:'상영이 멈춘 3분'},
+ {id:'haejun_rain_home',who:'haejun',dateIndex:4,title:'우리 집의 작은 상영관'}
 );
 const MOMENT_TEXT={
  momo:['모모가 앞치마에 묻은 밀가루를 털고 너를 포근히 안았다.','모모가 네 볼에 입을 맞추고는 자기가 먼저 수줍게 웃었다.','빗소리에 묻혀 모모의 목소리가 떨렸다. 네가 건넨 손수건에 눈물 한 방울이 번졌다.'],
