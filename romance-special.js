@@ -98,8 +98,8 @@ sceneSvg='<path d="M0 330Q180 295 370 329T800 300v130H0z" fill="#99759b" opacity
 return '<svg viewBox="0 0 800 430" preserveAspectRatio="xMidYMid slice" aria-hidden="true" role="presentation">'+sky+sceneSvg+'</svg>';
 }
 function cgArtwork(info,mini){
-const c=cast(info.who);
-return '<div class="cg-card-art '+(mini?'cg-small':'')+'"><div class="cg-landscape">'+artBackground(info.art)+'<div class="cg-character">'+portrait({...c,mood:1})+'</div><span class="cg-sparkle" aria-hidden="true">♥</span></div><div class="cg-caption"><b>'+esc(info.title)+'</b><small>'+c.name+' · '+(info.secret?'숨겨진 이야기':'데이트 CG')+'</small></div></div>';
+ const label=esc(cast(info.who).name+' · '+info.title);
+ return '<figure class="cg-card-art" style="margin:0"><img src="./assets/cg/'+info.id+'.webp" alt="'+label+'" style="display:block;width:100%;aspect-ratio:2.35;object-fit:cover">'+(mini?'<figcaption>'+label+'</figcaption>':'')+'</figure>';
 }
 function scenePicture(c,line){
 const info=scene.cgId&&cgInfo(scene.cgId);
