@@ -14,7 +14,13 @@ const CGS=[
 ['sion_secret','sion',null,'현상하지 않은 필름','stars'],
 ['doha_secret','doha',null,'우표 없는 편지','letter']
 ].map(function(a,i){return {id:a[0],who:a[1],chapter:a[2],title:a[3],art:a[4],secret:i>=8}});
-for(const c of newResidents)CGS.push({id:c.cg,who:c.id,chapter:7,title:c.id==='eden'?'이미 잠근 셔터':'옆자리의 표',secret:false});
+for(const c of newResidents)CGS.push({id:c.cg,who:c.id,chapter:c.id==='eden'?6:7,title:c.id==='eden'?'이미 잠근 셔터':'옆자리의 표',secret:false});
+CGS.push(
+ {id:'eden_cake',who:'eden',chapter:2,title:'삼 일 늦은 생일'},
+ {id:'haejun_empty',who:'haejun',chapter:3,title:'관객 없는 수요일'},
+ {id:'eden_pizza',who:'eden',dateIndex:1,title:'오늘은 사장님도 앉아'},
+ {id:'haejun_popcorn',who:'haejun',dateIndex:3,title:'팝콘 한 통이면 돼'}
+);
 const MOMENT_TEXT={
  momo:['모모가 앞치마에 묻은 밀가루를 털고 너를 포근히 안았다.','모모가 네 볼에 입을 맞추고는 자기가 먼저 수줍게 웃었다.','빗소리에 묻혀 모모의 목소리가 떨렸다. 네가 건넨 손수건에 눈물 한 방울이 번졌다.'],
  rui:['루이는 읽던 책을 덮었다. 네가 기대자 조용히 품을 내주었다.','루이는 책장 너머를 흘끗 보고는 네 볼에 살짝 입을 맞췄다.','원고의 마지막 줄에서 루이의 목소리가 멎었다. 고개를 들자 눈물이 볼을 타고 흘렀다.'],
@@ -73,7 +79,7 @@ if(!Array.isArray(state.secretSeen))state.secretSeen=[];
 if(!gallery.cgs||typeof gallery.cgs!=='object')gallery.cgs={};
 if(!gallery.secrets||typeof gallery.secrets!=='object')gallery.secrets={};
 let changed=false;
-for(const entry of CGS){if(!entry.moment&&!entry.secret&&chapter(entry.who)>entry.chapter&&!gallery.cgs[entry.id]){gallery.cgs[entry.id]=true;changed=true}}
+for(const entry of CGS){if(!entry.moment&&!entry.secret&&(entry.dateIndex===undefined?chapter(entry.who)>entry.chapter:(state.coupleEpisodeCount?.[entry.who]||0)>entry.dateIndex)&&!gallery.cgs[entry.id]){gallery.cgs[entry.id]=true;changed=true}}
 if(changed)saveGallery();
 }
 function cgInfo(id){return CGS.find(x=>x.id===id)}
