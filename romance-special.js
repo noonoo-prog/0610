@@ -14,6 +14,37 @@ const CGS=[
 ['sion_secret','sion',null,'현상하지 않은 필름','stars'],
 ['doha_secret','doha',null,'우표 없는 편지','letter']
 ].map(function(a,i){return {id:a[0],who:a[1],chapter:a[2],title:a[3],art:a[4],secret:i>=8}});
+const MOMENT_TEXT={
+ momo:['모모가 앞치마에 묻은 밀가루를 털고 너를 포근히 안았다.','모모가 네 볼에 입을 맞추고는 자기가 먼저 수줍게 웃었다.','빗소리에 묻혀 모모의 목소리가 떨렸다. 네가 건넨 손수건에 눈물 한 방울이 번졌다.'],
+ rui:['루이는 읽던 책을 덮었다. 네가 기대자 조용히 품을 내주었다.','루이는 책장 너머를 흘끗 보고는 네 볼에 살짝 입을 맞췄다.','원고의 마지막 줄에서 루이의 목소리가 멎었다. 고개를 들자 눈물이 볼을 타고 흘렀다.'],
+ sion:['옥상에 돌아온 시온은 두 팔을 벌렸다. 이번엔 농담 한마디 없이 너를 꼭 안았다.','시온이 네 볼에 살짝 입을 맞췄다. 먼저 시선을 피한 건 시온이었다.','암실에서 나와 옥상 바람을 맞자 참았던 눈물이 흘렀다. 시온은 네가 내민 손수건을 받아 들었다.'],
+ doha:['자전거를 세운 도하가 네 쪽으로 돌아섰다. 둘은 강바람 속에서 한참 서로를 안았다.','도하는 네 대답을 듣고 몸을 숙였다. 볼에 짧은 입맞춤이 닿았다.','강변까지 걸어온 도하는 편지를 다시 펼쳤다. 네가 손수건을 꺼내자 그제야 눈물을 보였다.']
+};
+for(const who of Object.keys(MOMENT_TEXT)){
+ for(const [kind,title] of Object.entries({hug:'품에 안긴 순간',kiss:'볼에 닿은 입맞춤',tears:'눈물을 보인 날'})){
+  CGS.push({id:who+'_'+kind,who,title,moment:true});
+ }
+}
+function dateWithMoments(id){
+ const stories=DATE_STORIES[id];
+ if(!state.dateOrder)state.dateOrder={};
+ let order=state.dateOrder[id];
+ if(!Array.isArray(order)||!order.length){
+  order=stories.map((_,i)=>i);
+  for(let i=order.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [order[i],order[j]]=[order[j],order[i]];
+  }
+  order.push(stories.length); // 세 편 뒤에는 기존 커플 데이트로 돌아간다.
+  state.dateOrder[id]=order;
+  save();
+ }
+ const story=stories[order[0]];
+ if(!story)return dateFor(id);
+ const choices=[[story.choice,2,story.reply],['“잠깐 안아 줄래?”',2,MOMENT_TEXT[id][0],'hug'],['“내 볼에 뽀뽀해 줄래?”',2,MOMENT_TEXT[id][1],'kiss']];
+ return {...dateFor(id),title:story.title,lines:story.lines,choices};
+
+}
 const HIDDEN={
 momo:{chapter:4,min:6,choice:3,title:'창가 아래 숨긴 쪽지',place:'문 닫은 카페',lines:[
 ['나레이션','창가 아래에서 바랜 쪽지 한 장을 발견한다.'],
@@ -41,7 +72,7 @@ if(!Array.isArray(state.secretSeen))state.secretSeen=[];
 if(!gallery.cgs||typeof gallery.cgs!=='object')gallery.cgs={};
 if(!gallery.secrets||typeof gallery.secrets!=='object')gallery.secrets={};
 let changed=false;
-for(const entry of CGS){if(!entry.secret&&chapter(entry.who)>entry.chapter&&!gallery.cgs[entry.id]){gallery.cgs[entry.id]=true;changed=true}}
+for(const entry of CGS){if(!entry.moment&&!entry.secret&&chapter(entry.who)>entry.chapter&&!gallery.cgs[entry.id]){gallery.cgs[entry.id]=true;changed=true}}
 if(changed)saveGallery();
 }
 function cgInfo(id){return CGS.find(x=>x.id===id)}
@@ -99,19 +130,20 @@ return '<svg viewBox="0 0 800 430" preserveAspectRatio="xMidYMid slice" aria-hid
 }
 function cgArtwork(info,mini){
  const label=esc(cast(info.who).name+' · '+info.title);
- return '<figure class="cg-card-art" style="margin:0"><img src="./assets/cg/'+info.id+'.webp?v=portraits2" alt="'+label+'" style="display:block;width:100%;height:auto">'+(mini?'<figcaption>'+label+'</figcaption>':'')+'</figure>';
+ return '<figure class="cg-card-art" style="margin:0"><img src="./assets/cg/'+(info.id==='sion_sunset'?'sion_sunset_soft':info.id)+'.webp?v=portraits2" alt="'+label+'" style="display:block;width:100%;height:auto">'+(mini?'<figcaption>'+label+'</figcaption>':'')+'</figure>';
 }
 function scenePicture(c,line){
 const info=scene.cgId&&cgInfo(scene.cgId);
-if(info&&(result||step>=1))return cgArtwork(info,false);
+if(info)return cgArtwork(info,false);
 return '<div class="scenery"><span class="scenery-label">'+esc(scene.data.place)+'</span><span class="scenery-decoration">'+esc(scene.data.decoration)+'</span></div>'+emotionPortrait(c,line);
 }
 function cgUnlocked(id){return !!gallery.cgs[id]}
 function renderSpecialAlbum(){
 initSpecial();const done=CGS.filter(x=>cgUnlocked(x.id)).length;
-mainShell('<section class="hero"><div><span class="pill">추억 앨범</span><h1>다시 보고 싶은<br>우리의 특별한 장면.</h1><p class="desc">데이트와 비밀 이벤트를 완성하면 일러스트가 모여요. 연애를 새로 시작해도 이 앨범은 남아요.</p><div class="actions"><span class="stat">CG '+done+' / 12</span><span class="stat">엔딩 '+CAST.filter(c=>gallery[c.id]).length+' / 4</span></div></div><div class="hero-art">'+portrait(player())+'</div></section>'+
-'<div class="section-header"><h2>특별 데이트 CG</h2><p>캐릭터별 2장</p></div><div class="album cg-grid">'+CGS.filter(x=>!x.secret).map(cgThumb).join('')+'</div>'+
+mainShell('<section class="hero"><div><span class="pill">추억 앨범</span><h1>다시 보고 싶은<br>우리의 특별한 장면.</h1><p class="desc">데이트와 비밀 이벤트를 완성하면 일러스트가 모여요. 연애를 새로 시작해도 이 앨범은 남아요.</p><div class="actions"><span class="stat">CG '+done+' / '+CGS.length+'</span><span class="stat">엔딩 '+CAST.filter(c=>gallery[c.id]).length+' / 4</span></div></div><div class="hero-art">'+portrait(player())+'</div></section>'+
+'<div class="section-header"><h2>특별 데이트 CG</h2><p>캐릭터별 2장</p></div><div class="album cg-grid">'+CGS.filter(x=>!x.secret&&!x.moment).map(cgThumb).join('')+'</div>'+
 '<div class="section-header"><h2>숨겨진 이야기</h2></div><div class="album cg-grid">'+CGS.filter(x=>x.secret).map(cgThumb).join('')+'</div>'+
+'<div class="section-header"><h2>둘만의 순간</h2></div><div class="album cg-grid">'+CGS.filter(x=>x.moment).map(cgThumb).join('')+'</div>'+
 '<div class="section-header"><h2>연애 엔딩</h2></div><div class="album">'+CAST.map(c=>'<article class="memory '+(gallery[c.id]?'':'locked')+'"><span class="symbol">'+(gallery[c.id]?'♥':'♡')+'</span><div class="pill">'+c.name+' ROUTE</div><b>'+(gallery[c.id]?c.ending:'아직 쓰이지 않은 이야기')+'</b><p class="sub">'+(gallery[c.id]?c.endingText:'더 친해지면 이야기가 열립니다.')+'</p></article>').join('')+'</div>'+
 '<div class="section-header"><h2>다시 시작하기</h2></div><div class="panel"><p class="sub">연애 진행 상황만 새롭게 시작합니다. 생활 모드와 수집한 엔딩·CG는 보관돼요.</p><div class="actions"><button class="btn ghost" onclick="resetRomance()">새로운 연애 시작하기</button></div></div>');
 }
