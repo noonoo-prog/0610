@@ -130,7 +130,7 @@ return '<svg viewBox="0 0 800 430" preserveAspectRatio="xMidYMid slice" aria-hid
 }
 function cgArtwork(info,mini){
  const label=esc(cast(info.who).name+' · '+info.title);
- return '<figure class="cg-card-art" style="margin:0"><img src="./assets/cg/'+(info.id==='sion_sunset'?'sion_sunset_soft':info.id)+'.webp?v=portraits2" alt="'+label+'" style="display:block;width:100%;height:auto">'+(mini?'<figcaption>'+label+'</figcaption>':'')+'</figure>';
+ return '<figure class="cg-card-art" style="margin:0"><img src="./assets/cg/'+(info.id==='sion_sunset'?'sion_sunset_soft':info.id)+'.webp?v=cg1280x576" alt="'+label+'" width="1280" height="576" style="display:block;width:100%;height:auto;aspect-ratio:20/9">'+(mini?'<figcaption>'+label+'</figcaption>':'')+'</figure>';
 }
 function scenePicture(c,line){
 const info=scene.cgId&&cgInfo(scene.cgId);
