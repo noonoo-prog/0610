@@ -249,4 +249,37 @@ load();
 </script>
 <script src="./romance-chapters.js"></script>
 <script src="./romance-special.js"></script>
-</body></html>
+<style>.scene-paint{position:absolute;inset:0}.scene-paint svg{width:100%;height:100%}</style><script>
+const crossroads={"momo":[5,"내일 첫 잔은 내가 주문할게. 메뉴 이름은 비밀로 해 줘.","모모가 예약표에 작은 하트를 그렸다.","메뉴판은 뒤집어 둘까? 결정은 내일 해도 돼.","모모는 분필을 내려놓고 네 옆에 앉았다.","세 잔 중 하나만 지금 같이 만들어 보자.","둘의 앞치마에 같은 모양으로 시럽이 튀었다."],"rui":[5,"주인공이 손을 잡으면 좋겠어. 내가 좋아하는 장면이거든.","루이가 네 손등을 힐끗 봤다.","다음 줄은 비워 두자. 네가 먼저 읽어 주는 날까지.","루이가 연필을 내려놓고 책갈피를 끼웠다.","한 줄씩 번갈아 써 볼까?","두 사람의 글씨가 같은 줄에서 만났다."],"sion":[5,"솔직히 벌써 보고 싶어. 역까지 같이 가도 돼?","시온이 기차표 옆자리에 네 이름을 써 보았다.","답장 걱정 없이 다녀와. 첫 전시는 네 속도로 봐.","시온은 접어 둔 전시 계획을 끝까지 펼쳤다.","일요일마다 서로 본 풍경을 한 장씩 바꾸자.","시온이 달력에 작은 네모를 그렸다."],"doha":[5,"다음 버스도 보내자. 아직 같이 있고 싶어.","도하가 네 쪽으로 반 걸음 옮겼다.","결과가 나오면 네가 먼저 알려 줘. 기다릴게.","도하는 휴대폰을 주머니에 넣고 편하게 숨을 내쉬었다.","나도 좀 걱정돼. 정류장 하나만 걸으며 얘기할까?","도하가 노선도를 접고 너와 보폭을 맞췄다."]};
+for(const [id,[chapterIndex,...words]] of Object.entries(crossroads)){
+  STORIES[id][chapterIndex].choices=[0,1,2].map((_,slot)=>{
+    const style=(slot+CAST.findIndex(c=>c.id===id))%3;
+    return [words[style*2],[2,0,1][style],words[style*2+1],[0,2,1][style]];
+  });
+}
+function trust(id){
+  return (state.choices[id]||[]).reduce((sum,answer,n)=>{
+    const choice=STORIES[id][n]?.choices[answer];
+    return Math.min(10,sum+(choice?.[3]??(choice?.[1]>0?1:0)));
+  },0);
+}
+const originalStory=storyAt;
+storyAt=function(id,n){
+  const data=originalStory(id,n);
+  if(n===6){
+    const prev=STORIES[id][5].choices[state.choices[id]?.[5]];
+    if(prev)data.lines.splice(1,0,['나레이션',prev[2]+' 그날의 일이 떠오른다.']);
+  }
+  return data;
+};
+const originalSecret=secretAvailable;
+secretAvailable=function(id){return originalSecret(id)&&trust(id)>=3};
+const originalHearts=hearts;
+hearts=function(id){return originalHearts(id)+'<div class="sub">신뢰 '+trust(id)+' / 10</div>'};
+const originalPicture=scenePicture;
+scenePicture=function(c,line){
+ if(scene.cgId)return originalPicture(c,line);
+ const art={momo:'cafe',rui:'books',sion:'sunset',doha:'river'}[c.id];
+ return '<div class="scene-paint">'+artBackground(art)+'</div><span class="scenery-label">'+esc(scene.data.place)+'</span>'+emotionPortrait(c,line);
+};
+render();</script></body></html>
