@@ -262,7 +262,7 @@ rui:['루이는 “네 속도로 읽을게”라는 네 말을 떠올리며 서�
 sion:['시온은 네가 “사진 밖에서도 기억할게”라고 했던 말을 아직 기억한다.','시온은 네가 찍어 준 자신의 사진을 가장 먼저 벽에 걸었다.','시온은 셀카보다 중요한 순간이 무엇인지 생각해 왔다.'],
 doha:['도하는 “결정은 네 것”이라는 말을 여러 번 되뇌었다.','도하는 네가 솔직히 아쉽다고 말했던 순간을 기억한다.','도하는 자신이 왜 떠나려 했는지 다시 생각해 보기로 했다.']
 };
-if(Number.isInteger(prev))copy.lines.splice(1,0,['나레이션',lines[id][prev]]);
+if(lines[id]&&Number.isInteger(prev))copy.lines.splice(1,0,['나레이션',lines[id][prev]]);
 }
 return copy;
 }

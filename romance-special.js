@@ -14,6 +14,7 @@ const CGS=[
 ['sion_secret','sion',null,'현상하지 않은 필름','stars'],
 ['doha_secret','doha',null,'우표 없는 편지','letter']
 ].map(function(a,i){return {id:a[0],who:a[1],chapter:a[2],title:a[3],art:a[4],secret:i>=8}});
+for(const c of newResidents)CGS.push({id:c.cg,who:c.id,chapter:7,title:c.id==='eden'?'이미 잠근 셔터':'옆자리의 표',secret:false});
 const MOMENT_TEXT={
  momo:['모모가 앞치마에 묻은 밀가루를 털고 너를 포근히 안았다.','모모가 네 볼에 입을 맞추고는 자기가 먼저 수줍게 웃었다.','빗소리에 묻혀 모모의 목소리가 떨렸다. 네가 건넨 손수건에 눈물 한 방울이 번졌다.'],
  rui:['루이는 읽던 책을 덮었다. 네가 기대자 조용히 품을 내주었다.','루이는 책장 너머를 흘끗 보고는 네 볼에 살짝 입을 맞췄다.','원고의 마지막 줄에서 루이의 목소리가 멎었다. 고개를 들자 눈물이 볼을 타고 흘렀다.'],
@@ -140,8 +141,8 @@ return '<div class="scenery"><span class="scenery-label">'+esc(scene.data.place)
 function cgUnlocked(id){return !!gallery.cgs[id]}
 function renderSpecialAlbum(){
 initSpecial();const done=CGS.filter(x=>cgUnlocked(x.id)).length;
-mainShell('<section class="hero"><div><span class="pill">추억 앨범</span><h1>다시 보고 싶은<br>우리의 특별한 장면.</h1><p class="desc">데이트와 비밀 이벤트를 완성하면 일러스트가 모여요. 연애를 새로 시작해도 이 앨범은 남아요.</p><div class="actions"><span class="stat">CG '+done+' / '+CGS.length+'</span><span class="stat">엔딩 '+CAST.filter(c=>gallery[c.id]).length+' / 4</span></div></div><div class="hero-art">'+portrait(player())+'</div></section>'+
-'<div class="section-header"><h2>특별 데이트 CG</h2><p>캐릭터별 2장</p></div><div class="album cg-grid">'+CGS.filter(x=>!x.secret&&!x.moment).map(cgThumb).join('')+'</div>'+
+mainShell('<section class="hero"><div><span class="pill">추억 앨범</span><h1>다시 보고 싶은<br>우리의 특별한 장면.</h1><p class="desc">데이트와 비밀 이벤트를 완성하면 일러스트가 모여요. 연애를 새로 시작해도 이 앨범은 남아요.</p><div class="actions"><span class="stat">CG '+done+' / '+CGS.length+'</span><span class="stat">엔딩 '+CAST.filter(c=>gallery[c.id]).length+' / '+CAST.length+'</span></div></div><div class="hero-art">'+portrait(player())+'</div></section>'+
+'<div class="section-header"><h2>특별 데이트 CG</h2></div><div class="album cg-grid">'+CGS.filter(x=>!x.secret&&!x.moment).map(cgThumb).join('')+'</div>'+
 '<div class="section-header"><h2>숨겨진 이야기</h2></div><div class="album cg-grid">'+CGS.filter(x=>x.secret).map(cgThumb).join('')+'</div>'+
 '<div class="section-header"><h2>둘만의 순간</h2></div><div class="album cg-grid">'+CGS.filter(x=>x.moment).map(cgThumb).join('')+'</div>'+
 '<div class="section-header"><h2>연애 엔딩</h2></div><div class="album">'+CAST.map(c=>'<article class="memory '+(gallery[c.id]?'':'locked')+'"><span class="symbol">'+(gallery[c.id]?'♥':'♡')+'</span><div class="pill">'+c.name+' ROUTE</div><b>'+(gallery[c.id]?c.ending:'아직 쓰이지 않은 이야기')+'</b><p class="sub">'+(gallery[c.id]?c.endingText:'더 친해지면 이야기가 열립니다.')+'</p></article>').join('')+'</div>'+
